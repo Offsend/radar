@@ -1,8 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import CohortCard from '../../components/CohortCard.astro';
-import IgnoreCoverage from '../../components/IgnoreCoverage.astro';
-import ExposedPatterns from '../../components/ExposedPatterns.astro';
+import ReportSections from '../../components/ReportSections.astro';
 import { getAllSummaries, getSummaryByWeek, formatGeneratedAt } from '../../lib/summaries';
 
 export async function getStaticPaths() {
@@ -23,15 +21,8 @@ if (!summary) {
 <BaseLayout title={`Week ${summary.data.week}`} activeNav="archive">
 	<header class="page-header">
 		<h1>Week {summary.data.week}</h1>
-		<p>
-			Generated {formatGeneratedAt(summary.data.generatedAt)} UTC · ruleset
-			<span class="mono"> {summary.data.rulesetVersions[0]} </span>
-		</p>
+		<p>Published {formatGeneratedAt(summary.data.generatedAt)} UTC</p>
 	</header>
 
-	<div class="grid" style="gap: 1.5rem">
-		<CohortCard summary={summary} />
-		<ExposedPatterns summary={summary} />
-		<IgnoreCoverage summary={summary} />
-	</div>
+	<ReportSections summary={summary} />
 </BaseLayout>

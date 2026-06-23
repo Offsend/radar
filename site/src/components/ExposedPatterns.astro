@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { formatPatternLabel } from '../lib/labels';
 
 interface Props {
 	summary: CollectionEntry<'summaries'>;
@@ -10,37 +11,68 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 ---
 
 <div class="card">
-	<h2>Exposed patterns</h2>
+	<h3>Exposed file categories</h3>
+	<p class="card-scope">Aggregated pattern counts — not tied to any named repository.</p>
 	{patterns.length === 0 ? (
-		<p class="empty-state">No exposed patterns this week.</p>
+		<p class="empty-state-inline">No exposed file categories this week.</p>
 	) : (
-		<div class="table-wrap">
-			<table>
-				<thead>
-					<tr>
-						<th>Pattern</th>
-						<th>Category</th>
-						<th>Severity</th>
-						<th>Repos</th>
-						<th>Count</th>
-					</tr>
-				</thead>
-				<tbody>
-					{patterns.map((pattern) => (
-						<tr>
-							<td class="mono">{pattern.id}</td>
-							<td>
-								<span class="badge badge-secret">{pattern.category}</span>
-							</td>
-							<td>
-								<span class="badge badge-required">{pattern.severity}</span>
-							</td>
-							<td>{pattern.reposAffected}</td>
-							<td>{pattern.totalCount}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
+		<ul class="finding-list">
+			{patterns.map((pattern) => (
+				<li class="finding-item">
+					<span class="finding-label">{formatPatternLabel(pattern.id)}</span>
+					<span class="finding-meta">
+						{pattern.reposAffected} {pattern.reposAffected === 1 ? 'repo' : 'repos'} · {pattern.totalCount}{' '}
+						{pattern.totalCount === 1 ? 'file' : 'files'}
+					</span>
+				</li>
+			))}
+		</ul>
 	)}
 </div>
+
+<style>
+	.card-scope {
+		margin: -0.5rem 0 1rem;
+		font-size: 0.85rem;
+		color: var(--text-mut);
+		line-height: 1.4;
+	}
+
+	.empty-state-inline {
+		margin: 0;
+		color: var(--text-mut);
+		font-size: 0.95rem;
+	}
+
+	.finding-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.finding-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1rem;
+		padding: 0.65rem 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.finding-item:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.finding-label {
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: var(--text);
+	}
+
+	.finding-meta {
+		flex-shrink: 0;
+		font-size: 0.85rem;
+		color: var(--text-mut);
+	}
+</style>

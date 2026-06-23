@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ListingReport from '../components/ListingReport.astro';
+import { getAllTimeParticipants } from '../lib/participants';
+
+const participants = await getAllTimeParticipants();
+---
+
+<BaseLayout
+	title="Participants"
+	activeNav="participants"
+	description="Repositories whose maintainers opted in to appear by name on Offsend Radar."
+>
+	<header class="page-header">
+		<h1>Participants</h1>
+		<p>
+			All repositories whose maintainers opted in to a named AI-context hygiene review. Each card
+			shows the latest published scan; week links open that week's full fleet report.
+		</p>
+	</header>
+
+	{participants.length === 0 ? (
+		<div class="card empty-state">
+			<p>No participants yet. Maintainers can opt in via the radar registry.</p>
+			<p>
+				<a href="https://github.com/Offsend/radar#named-public-listings-maintainer-opt-in">
+					How to opt in →
+				</a>
+			</p>
+		</div>
+	) : (
+		<div class="participants-directory">
+			{participants.map((participant) => (
+				<section class="participant-section">
+					<ListingReport
+						listing={participant.latestListing}
+						week={participant.lastWeek}
+						reportTitle="Latest scan"
+					/>
+					<div class="participant-meta card">
+						<p class="participant-meta-label">Published in Radar</p>
+						<ul class="week-links">
+							{participant.weeks.map((week) => (
+								<li>
+									<a href={`/week/${week}`} class="mono">{week}</a>
+								</li>
+							))}
+						</ul>
+						{participant.weeks.length > 1 && (
+							<p class="participant-meta-note">
+								First appearance: <span class="mono">{participant.firstWeek}</span> · Latest:{' '}
+								<span class="mono">{participant.lastWeek}</span>
+							</p>
+						)}
+					</div>
+				</section>
+			))}
+		</div>
+	)}
+</BaseLayout>
+
+<style>
+	.participants-directory {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.participant-section {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.participant-meta {
+		padding: 1rem 1.25rem;
+	}
+
+	.participant-meta-label {
+		margin: 0 0 0.5rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--text-mut);
+	}
+
+	.week-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 0.75rem;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.week-links a {
+		color: var(--blue-text);
+		font-weight: 500;
+	}
+
+	.week-links a:hover {
+		text-decoration: underline;
+	}
+
+	.participant-meta-note {
+		margin: 0.75rem 0 0;
+		font-size: 0.85rem;
+		color: var(--text-mut);
+	}
+
+	.empty-state a {
+		color: var(--blue-text);
+	}
+</style>

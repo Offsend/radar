@@ -1,0 +1,58 @@
+---
+import type { SummaryEntry } from '../lib/summaries';
+import CohortCard from './CohortCard.astro';
+import ExposedPatterns from './ExposedPatterns.astro';
+import IgnoreCoverage from './IgnoreCoverage.astro';
+import PublicListings from './PublicListings.astro';
+import ReportSummary from './ReportSummary.astro';
+import SectionGroup from './SectionGroup.astro';
+import TrendList from './TrendList.astro';
+
+interface Props {
+	summary: SummaryEntry;
+	summaries?: SummaryEntry[];
+	showTrend?: boolean;
+}
+
+const { summary, summaries = [], showTrend = false } = Astro.props;
+---
+
+<div class="report-sections">
+	<SectionGroup
+		title="Fleet snapshot"
+		description="Anonymous counts across all complete scans this week. No repository names are shown."
+	>
+		<ReportSummary summary={summary} />
+		<CohortCard summary={summary} />
+
+		<div class="grid grid-2 report-insights">
+			<ExposedPatterns summary={summary} />
+			{showTrend && summaries.length > 0 ? (
+				<TrendList summaries={summaries} />
+			) : (
+				<IgnoreCoverage summary={summary} />
+			)}
+		</div>
+
+		{showTrend && <IgnoreCoverage summary={summary} />}
+	</SectionGroup>
+
+	<SectionGroup
+		title="Named participants"
+		description="Per-repository reports for maintainers who opted in. Fleet counts above stay anonymous; each card below is that repo's own scan."
+		variant="participants"
+	>
+		<PublicListings summary={summary} />
+	</SectionGroup>
+</div>
+
+<style>
+	.report-sections {
+		display: grid;
+		gap: 2rem;
+	}
+
+	.report-insights {
+		align-items: start;
+	}
+</style>

@@ -1,0 +1,58 @@
+---
+interface Props {
+	title: string;
+	description: string;
+	variant?: 'fleet' | 'participants';
+}
+
+const { title, description, variant = 'fleet' } = Astro.props;
+---
+
+<section class="report-zone" data-variant={variant}>
+	<header class="report-zone-header">
+		<h2 class="report-zone-title">{title}</h2>
+		<p class="report-zone-desc">{description}</p>
+	</header>
+	<div class="report-zone-body">
+		<slot />
+	</div>
+</section>
+
+<style>
+	.report-zone {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.report-zone[data-variant='participants'] {
+		padding-top: 0.5rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.report-zone-header {
+		margin-bottom: 0.25rem;
+	}
+
+	.report-zone-title {
+		margin: 0 0 0.35rem;
+		font-family: var(--heading);
+		font-size: 1.35rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: var(--text);
+		text-transform: none;
+	}
+
+	.report-zone-desc {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--text-mut);
+		line-height: 1.45;
+		max-width: 52rem;
+	}
+
+	.report-zone-body {
+		display: grid;
+		gap: 1rem;
+	}
+</style>

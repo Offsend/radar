@@ -1,43 +1,132 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { computeIgnoreCoverage, formatGeneratedAt, formatPct } from '../lib/summaries';
 
 interface Props {
 	summary: CollectionEntry<'summaries'>;
 }
 
 const { summary } = Astro.props;
-const { cohort } = summary.data;
+const { cohort, totals, toolVersionRange, rulesetVersions } = summary.data;
+const { reposWithIgnorePct } = computeIgnoreCoverage(summary);
 ---
 
-<div class="grid grid-3">
-	<div class="card">
-		<h3>Targeted</h3>
-		<div class="stat-value">{cohort.targeted}</div>
-		<div class="stat-label">repos in cohort</div>
-	</div>
+<div class="kpi-grid">
 	<div class="card">
 		<h3>Scanned</h3>
-		<div class="stat-value">{cohort.scanned}</div>
-		<div class="stat-label">completed this week</div>
-	</div>
-	<div class="card">
-		<h3>Scan complete</h3>
 		<div class="stat-value">{cohort.scanComplete}</div>
-		<div class="stat-label">full scans (in stats)</div>
+		<div class="stat-label">repos in this week's stats</div>
 	</div>
 	<div class="card">
-		<h3>Skipped</h3>
-		<div class="stat-value">{cohort.skipped}</div>
-		<div class="stat-label">not scanned</div>
+		<h3>Exposed files</h3>
+		<div class="stat-value">{totals.totalExposedFiles}</div>
+		<div class="stat-label">paths AI tools may read</div>
 	</div>
 	<div class="card">
-		<h3>Errors</h3>
-		<div class="stat-value">{cohort.errors}</div>
-		<div class="stat-label">scan failures</div>
-	</div>
-	<div class="card">
-		<h3>Exposures</h3>
-		<div class="stat-value">{summary.data.totals.totalExposedFiles}</div>
-		<div class="stat-label">exposed files total</div>
+		<h3>Ignore coverage</h3>
+		<div class="stat-value">{formatPct(reposWithIgnorePct)}</div>
+		<div class="stat-label">repos with AI ignore files</div>
 	</div>
 </div>
+
+<details class="scan-details">
+	<summary>Scan details</summary>
+	<dl class="scan-details-grid">
+		<div>
+			<dt>Targeted</dt>
+			<dd>{cohort.targeted}</dd>
+		</div>
+		<div>
+			<dt>Scanned</dt>
+			<dd>{cohort.scanned}</dd>
+		</div>
+		<div>
+			<dt>Scan complete</dt>
+			<dd>{cohort.scanComplete}</dd>
+		</div>
+		<div>
+			<dt>Skipped</dt>
+			<dd>{cohort.skipped}</dd>
+		</div>
+		<div>
+			<dt>Errors</dt>
+			<dd>{cohort.errors}</dd>
+		</div>
+		<div>
+			<dt>Repos with exposures</dt>
+			<dd>{totals.reposWithExposures}</dd>
+		</div>
+		<div>
+			<dt>Generated</dt>
+			<dd>{formatGeneratedAt(summary.data.generatedAt)} UTC</dd>
+		</div>
+		<div>
+			<dt>Tool version</dt>
+			<dd class="mono">{toolVersionRange.join('–') || '—'}</dd>
+		</div>
+		<div>
+			<dt>Ruleset</dt>
+			<dd class="mono">{rulesetVersions[0] ?? '—'}</dd>
+		</div>
+	</dl>
+</details>
+
+<style>
+	.kpi-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 1rem;
+	}
+
+	.scan-details {
+		margin-top: 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: var(--r);
+		background: oklch(100% 0 0 / 0.45);
+		padding: 0.75rem 1rem;
+	}
+
+	.scan-details summary {
+		cursor: pointer;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-sub);
+		list-style: none;
+	}
+
+	.scan-details summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.scan-details summary::before {
+		content: '▸ ';
+		display: inline-block;
+		transition: transform 0.15s ease;
+	}
+
+	.scan-details[open] summary::before {
+		transform: rotate(90deg);
+	}
+
+	.scan-details-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 0.75rem 1.25rem;
+		margin: 1rem 0 0;
+		padding: 0;
+	}
+
+	.scan-details-grid dt {
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		color: var(--text-mut);
+	}
+
+	.scan-details-grid dd {
+		margin: 0.15rem 0 0;
+		font-size: 0.9rem;
+		color: var(--text);
+	}
+</style>

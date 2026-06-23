@@ -1,9 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CohortCard from '../components/CohortCard.astro';
-import IgnoreCoverage from '../components/IgnoreCoverage.astro';
-import ExposedPatterns from '../components/ExposedPatterns.astro';
-import TrendList from '../components/TrendList.astro';
+import ReportSections from '../components/ReportSections.astro';
 import { getAllSummaries, getLatestSummary, formatGeneratedAt } from '../lib/summaries';
 
 const summaries = await getAllSummaries();
@@ -15,20 +12,10 @@ const latest = await getLatestSummary();
 		<>
 			<header class="page-header">
 				<h1>Week {latest.data.week}</h1>
-				<p>
-					Generated {formatGeneratedAt(latest.data.generatedAt)} UTC · tool
-					<span class="mono"> {latest.data.toolVersionRange.join('–')} </span>
-				</p>
+				<p>Published {formatGeneratedAt(latest.data.generatedAt)} UTC</p>
 			</header>
 
-			<div class="grid" style="gap: 1.5rem">
-				<CohortCard summary={latest} />
-				<div class="grid grid-2">
-					<ExposedPatterns summary={latest} />
-					<TrendList summaries={summaries} />
-				</div>
-				<IgnoreCoverage summary={latest} />
-			</div>
+			<ReportSections summary={latest} summaries={summaries} showTrend />
 		</>
 	) : (
 		<div class="card empty-state">

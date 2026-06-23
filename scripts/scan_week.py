@@ -81,6 +81,60 @@ def load_targets(state_dir: Path, week: str) -> dict[str, Any]:
     return data
 
 
+def load_public_listings(state_dir: Path) -> dict[str, dict[str, Any]]:
+    path = state_dir / "registry" / "public-listings.yml"
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8") as handle:
+        data = yaml.safe_load(handle) or {}
+    listings: dict[str, dict[str, Any]] = {}
+    for item in data.get("listings", []):
+        slug = item["repo"]
+        listings[slug] = {
+            "label": item.get("label", "AI Context Reviewed"),
+        }
+    return listings
+
+
+def build_public_listings(
+    state_dir: Path,
+    complete_rows: list[dict[str, Any]],
+    public_registry: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for row in complete_rows:
+        slug = row["repo"]
+        if slug not in public_registry:
+            continue
+        report_path = state_dir / row["runPath"] / "report.json"
+        if not report_path.exists():
+            continue
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        registry_entry = public_registry[slug]
+        exposed = report.get("exposedPatterns") or []
+        entries.append(
+            {
+                "repo": slug,
+                "url": f"https://github.com/{slug}",
+                "label": registry_entry["label"],
+                "scanComplete": bool(report.get("scanComplete")),
+                "toolVersion": report.get("toolVersion"),
+                "ignoreFilesPresent": report.get("ignoreFilesPresent") or {},
+                "exposedPatterns": [
+                    {
+                        "id": item["id"],
+                        "category": item["category"],
+                        "severity": item["severity"],
+                        "count": int(item.get("count") or 0),
+                    }
+                    for item in exposed
+                ],
+                "totals": report.get("totals") or {},
+            }
+        )
+    return sorted(entries, key=lambda item: item["repo"])
+
+
 def repos_for_week(state_dir: Path, week: str) -> set[str]:
     scanned = {row["repo"] for row in load_jsonl(state_dir / "state" / "scanned.jsonl") if row.get("week") == week}
     skipped = {row["repo"] for row in load_jsonl(state_dir / "state" / "skipped.jsonl") if row.get("week") == week}
@@ -306,16 +360,24 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
         },
     }
 
+    public_registry = load_public_listings(state_dir)
+    public_listings = build_public_listings(state_dir, complete_rows, public_registry)
+    export_summary = {**summary, "publicListings": public_listings}
+
     if dry_run:
         print(f"[dry-run] would write weekly summary for {week}")
-        return summary
+        if public_listings:
+            print(f"[dry-run] export would include {len(public_listings)} public listing(s)")
+        return export_summary
 
     weekly_path = state_dir / "weekly" / f"{week}.summary.json"
     export_path = state_dir / "export" / week / "summary.json"
     write_json(weekly_path, summary)
-    write_json(export_path, summary)
+    write_json(export_path, export_summary)
     print(f"aggregated: {weekly_path}")
-    return summary
+    if public_listings:
+        print(f"export listings: {len(public_listings)} repo(s) with maintainer opt-in")
+    return export_summary
 
 
 def resolve_offsend_bin(explicit: str | None) -> str:

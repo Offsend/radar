@@ -1,34 +1,103 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { formatPct } from '../lib/summaries';
+import { formatIgnoreLabel } from '../lib/labels';
+import { formatPct, getAllIgnoreRules, getNonZeroIgnoreRules } from '../lib/summaries';
 
 interface Props {
 	summary: CollectionEntry<'summaries'>;
-	limit?: number;
+	previewLimit?: number;
 }
 
-const { summary, limit = 12 } = Astro.props;
+const { summary, previewLimit = 5 } = Astro.props;
 
-const rules = Object.entries(summary.data.ignoreFilesPresent)
-	.sort(([, a], [, b]) => b.pct - a.pct)
-	.slice(0, limit);
+const nonZeroRules = getNonZeroIgnoreRules(summary);
+const previewRules = nonZeroRules.slice(0, previewLimit);
+const allRules = getAllIgnoreRules(summary);
+const hasMoreRules = allRules.length > previewRules.length;
 ---
 
 <div class="card">
-	<h2>Ignore file coverage</h2>
-	{rules.length === 0 ? (
-		<p class="empty-state">No ignore rules in this week's data.</p>
+	<h2>AI ignore file coverage</h2>
+	{nonZeroRules.length === 0 ? (
+		<p class="empty-state-inline">No AI ignore files detected in scanned repositories.</p>
 	) : (
-		<div>
-			{rules.map(([id, rule]) => (
+		<>
+			{previewRules.map(([id, rule]) => (
 				<div class="bar-row">
-					<span class="bar-label mono">{id}</span>
+					<span class="bar-label">{formatIgnoreLabel(id)}</span>
 					<div class="bar-track">
 						<div class="bar-fill" style={`width: ${Math.round(rule.pct * 100)}%`} />
 					</div>
 					<span class="bar-pct">{formatPct(rule.pct)}</span>
 				</div>
 			))}
-		</div>
+
+			{hasMoreRules && (
+				<details class="ignore-details">
+					<summary>
+						Show all {allRules.length} ignore types
+						{nonZeroRules.length < allRules.length &&
+							` (${nonZeroRules.length} in use)`}
+					</summary>
+					<div class="ignore-details-list">
+						{allRules.map(([id, rule]) => (
+							<div class="bar-row bar-row-compact">
+								<span class="bar-label">{formatIgnoreLabel(id)}</span>
+								<div class="bar-track">
+									<div
+										class="bar-fill"
+										class:list={{ 'bar-fill-zero': rule.pct === 0 }}
+										style={`width: ${Math.max(Math.round(rule.pct * 100), rule.pct > 0 ? 2 : 0)}%`}
+									/>
+								</div>
+								<span class="bar-pct">{formatPct(rule.pct)}</span>
+							</div>
+						))}
+					</div>
+				</details>
+			)}
+		</>
 	)}
 </div>
+
+<style>
+	.empty-state-inline {
+		margin: 0;
+		color: var(--text-mut);
+		font-size: 0.95rem;
+	}
+
+	.bar-row {
+		grid-template-columns: minmax(140px, 1fr) 1fr 52px;
+	}
+
+	.ignore-details {
+		margin-top: 0.75rem;
+		padding-top: 0.75rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.ignore-details summary {
+		cursor: pointer;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-sub);
+		list-style: none;
+	}
+
+	.ignore-details summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.ignore-details-list {
+		margin-top: 0.75rem;
+	}
+
+	.bar-row-compact {
+		padding: 0.25rem 0;
+	}
+
+	.bar-fill-zero {
+		opacity: 0.35;
+	}
+</style>

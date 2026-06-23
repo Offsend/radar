@@ -1,0 +1,79 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ListingReport from './ListingReport.astro';
+
+interface Props {
+	summary: CollectionEntry<'summaries'>;
+}
+
+const { summary } = Astro.props;
+const listings = summary.data.publicListings ?? [];
+const week = summary.data.week;
+---
+
+{listings.length === 0 ? (
+	<div class="card">
+		<p class="empty-state-inline">
+			No named listings this week. Maintainers can opt in via{' '}
+			<a href="https://github.com/Offsend/radar#named-public-listings-maintainer-opt-in">radar registry</a>.
+		</p>
+		<p class="empty-state-inline">
+			<a href="/participants">View all-time participants →</a>
+		</p>
+	</div>
+) : (
+	<>
+		<ul class="listing-list">
+			{listings.map((listing) => (
+				<li class="listing-list-item">
+					<ListingReport listing={listing} week={week} />
+				</li>
+			))}
+		</ul>
+		<p class="participants-link">
+			<a href="/participants">All participants who opted in →</a>
+		</p>
+	</>
+)}
+
+<style>
+	.empty-state-inline {
+		margin: 0 0 0.75rem;
+		color: var(--text-mut);
+		font-size: 0.95rem;
+	}
+
+	.empty-state-inline:last-child {
+		margin-bottom: 0;
+	}
+
+	.empty-state-inline a {
+		color: var(--blue-text);
+	}
+
+	.listing-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: grid;
+		gap: 1rem;
+	}
+
+	.listing-list-item {
+		margin: 0;
+	}
+
+	.participants-link {
+		margin: 0.75rem 0 0;
+		font-size: 0.9rem;
+	}
+
+	.participants-link a {
+		color: var(--blue-text);
+		font-weight: 500;
+	}
+
+	.participants-link a:hover {
+		text-decoration: underline;
+	}
+</style>

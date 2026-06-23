@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { buildReportSummary } from '../lib/summaries';
+
+interface Props {
+	summary: CollectionEntry<'summaries'>;
+}
+
+const { summary } = Astro.props;
+const sentences = buildReportSummary(summary);
+---
+
+<div class="card report-summary">
+	<p class="report-summary-lead">{sentences[0]}</p>
+	{sentences.slice(1).map((sentence) => (
+		<p class="report-summary-text">{sentence}</p>
+	))}
+</div>
+
+<style>
+	.report-summary-lead {
+		margin: 0 0 0.5rem;
+		font-size: 1.05rem;
+		font-weight: 500;
+		color: var(--text);
+		line-height: 1.5;
+	}
+
+	.report-summary-text {
+		margin: 0.35rem 0 0;
+		font-size: 0.95rem;
+		color: var(--text-sub);
+		line-height: 1.5;
+	}
+</style>

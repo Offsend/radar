@@ -15,12 +15,33 @@ const ignoreRuleSchema = z.object({
 	pct: z.number(),
 });
 
-const exposedPatternSchema = z.object({
+const fleetExposedPatternSchema = z.object({
 	id: z.string(),
 	category: z.string(),
 	severity: z.string(),
 	reposAffected: z.number(),
 	totalCount: z.number(),
+});
+
+const listingExposedPatternSchema = z.object({
+	id: z.string(),
+	category: z.string(),
+	severity: z.string(),
+	count: z.number(),
+});
+
+const publicListingSchema = z.object({
+	repo: z.string(),
+	url: z.string().url(),
+	label: z.string(),
+	scanComplete: z.boolean(),
+	toolVersion: z.string().optional(),
+	ignoreFilesPresent: z.record(z.string(), z.boolean()),
+	exposedPatterns: z.array(listingExposedPatternSchema),
+	totals: z.object({
+		exposedFiles: z.number().optional(),
+		exposedPatternTypes: z.number().optional(),
+	}),
 });
 
 const summarySchema = z.object({
@@ -31,11 +52,12 @@ const summarySchema = z.object({
 	rulesetVersions: z.array(z.string()),
 	cohort: cohortSchema,
 	ignoreFilesPresent: z.record(z.string(), ignoreRuleSchema),
-	exposedPatterns: z.array(exposedPatternSchema),
+	exposedPatterns: z.array(fleetExposedPatternSchema),
 	totals: z.object({
 		reposWithExposures: z.number(),
 		totalExposedFiles: z.number(),
 	}),
+	publicListings: z.array(publicListingSchema).optional(),
 });
 
 const summaries = defineCollection({

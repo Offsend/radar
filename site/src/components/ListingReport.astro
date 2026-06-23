@@ -1,0 +1,157 @@
+---
+import { formatIgnoreLabel, formatPatternLabel } from '../lib/labels';
+import type { PublicListing } from '../lib/participants';
+
+interface Props {
+	listing: PublicListing;
+	week?: string;
+	compact?: boolean;
+	reportTitle?: string;
+}
+
+const { listing, week, compact = false, reportTitle = "This week's scan" } = Astro.props;
+
+const ignorePresent = Object.entries(listing.ignoreFilesPresent)
+	.filter(([, present]) => present)
+	.map(([id]) => formatIgnoreLabel(id));
+
+const patterns = [...listing.exposedPatterns].sort((a, b) => b.count - a.count);
+const exposedFiles = listing.totals.exposedFiles ?? 0;
+---
+
+<article class="listing-report" class:list={{ compact }}>
+	<header class="listing-header">
+		<a href={listing.url} class="listing-repo mono">{listing.repo}</a>
+		<span class="badge badge-positive">{listing.label}</span>
+	</header>
+
+	<div class="report-block">
+		<h4 class="report-block-title">{reportTitle}</h4>
+		{week && <p class="report-week">Week <span class="mono">{week}</span></p>}
+
+		{patterns.length === 0 ? (
+			<p class="report-text">No exposed file categories detected.</p>
+		) : (
+			<>
+				<p class="report-text">
+					{exposedFiles} exposed {exposedFiles === 1 ? 'file' : 'files'} across{' '}
+					{patterns.length} {patterns.length === 1 ? 'category' : 'categories'}:
+				</p>
+				<ul class="finding-list">
+					{patterns.map((pattern) => (
+						<li class="finding-item">
+							<span class="finding-label">{formatPatternLabel(pattern.id)}</span>
+							<span class="finding-meta">
+								{pattern.count} {pattern.count === 1 ? 'file' : 'files'}
+							</span>
+						</li>
+					))}
+				</ul>
+			</>
+		)}
+	</div>
+
+	<div class="report-block">
+		<h4 class="report-block-title">AI ignore files</h4>
+		{ignorePresent.length > 0 ? (
+			<p class="report-text">{ignorePresent.join(', ')}</p>
+		) : (
+			<p class="report-text muted">None detected in this scan.</p>
+		)}
+	</div>
+</article>
+
+<style>
+	.listing-report {
+		background: oklch(100% 0 0 / 0.72);
+		border: 1px solid var(--border);
+		border-radius: var(--r);
+		padding: 1.25rem;
+		box-shadow:
+			0 1px 2px oklch(0% 0 0 / 0.04),
+			inset 0 1px 0 oklch(100% 0 0 / 0.85);
+	}
+
+	.listing-header {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+		margin-bottom: 1rem;
+	}
+
+	.listing-repo {
+		font-weight: 600;
+		color: var(--text);
+	}
+
+	.listing-repo:hover {
+		color: var(--blue-text);
+	}
+
+	.report-block + .report-block {
+		margin-top: 1rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.report-block-title {
+		margin: 0 0 0.35rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--text-mut);
+	}
+
+	.report-week {
+		margin: 0 0 0.5rem;
+		font-size: 0.85rem;
+		color: var(--text-sub);
+	}
+
+	.report-text {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--text-sub);
+		line-height: 1.45;
+	}
+
+	.report-text.muted {
+		color: var(--text-mut);
+	}
+
+	.finding-list {
+		list-style: none;
+		padding: 0;
+		margin: 0.5rem 0 0;
+	}
+
+	.finding-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1rem;
+		padding: 0.4rem 0;
+	}
+
+	.finding-item + .finding-item {
+		border-top: 1px solid var(--border);
+	}
+
+	.finding-label {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--text);
+	}
+
+	.finding-meta {
+		flex-shrink: 0;
+		font-size: 0.85rem;
+		color: var(--text-mut);
+	}
+
+	.compact .report-block-title {
+		font-size: 0.7rem;
+	}
+</style>
