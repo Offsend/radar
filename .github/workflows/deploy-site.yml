@@ -1,0 +1,69 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'scripts/sync_summaries.py'
+      - '.github/workflows/deploy-site.yml'
+  workflow_run:
+    workflows: [Weekly scan]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout radar
+        uses: actions/checkout@v4
+
+      - name: Checkout radar-state
+        uses: actions/checkout@v4
+        with:
+          repository: Offsend/radar-state
+          path: state
+          token: ${{ secrets.RADAR_STATE_TOKEN }}
+
+      - name: Sync summaries
+        run: python3 scripts/sync_summaries.py --state-dir state
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install and build
+        working-directory: site
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

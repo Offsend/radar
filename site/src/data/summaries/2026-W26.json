@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "week": "2026-W26",
+  "generatedAt": "2026-06-23T09:52:05Z",
+  "toolVersionRange": [
+    "0.0.5",
+    "0.0.5"
+  ],
+  "rulesetVersions": [
+    "6f8fef790c56173d"
+  ],
+  "cohort": {
+    "targeted": 2,
+    "scanned": 1,
+    "skipped": 1,
+    "errors": 0,
+    "scanComplete": 1
+  },
+  "ignoreFilesPresent": {
+    "agents-md": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "aider-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "claude-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "claude-md": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "cline-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "codeium-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "cody-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "continue-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "copilot-exclude": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "cursor-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "cursor-indexing-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "cursor-project-rules": {
+      "present": 1,
+      "total": 1,
+      "pct": 1.0
+    },
+    "gemini-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "git-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "llm-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "roo-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    },
+    "zed-ignore": {
+      "present": 0,
+      "total": 1,
+      "pct": 0.0
+    }
+  },
+  "exposedPatterns": [
+    {
+      "id": "env-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 1,
+      "totalCount": 2
+    },
+    {
+      "id": "pem-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 1,
+      "totalCount": 1
+    }
+  ],
+  "totals": {
+    "reposWithExposures": 1,
+    "totalExposedFiles": 3
+  }
+}

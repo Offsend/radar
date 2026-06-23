@@ -1,0 +1,46 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	summary: CollectionEntry<'summaries'>;
+}
+
+const { summary } = Astro.props;
+const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount - a.totalCount);
+---
+
+<div class="card">
+	<h2>Exposed patterns</h2>
+	{patterns.length === 0 ? (
+		<p class="empty-state">No exposed patterns this week.</p>
+	) : (
+		<div class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th>Pattern</th>
+						<th>Category</th>
+						<th>Severity</th>
+						<th>Repos</th>
+						<th>Count</th>
+					</tr>
+				</thead>
+				<tbody>
+					{patterns.map((pattern) => (
+						<tr>
+							<td class="mono">{pattern.id}</td>
+							<td>
+								<span class="badge badge-secret">{pattern.category}</span>
+							</td>
+							<td>
+								<span class="badge badge-required">{pattern.severity}</span>
+							</td>
+							<td>{pattern.reposAffected}</td>
+							<td>{pattern.totalCount}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	)}
+</div>

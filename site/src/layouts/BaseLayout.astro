@@ -1,0 +1,52 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+	activeNav?: 'home' | 'archive';
+}
+
+const { title, description, activeNav } = Astro.props;
+const fullTitle = title === 'Offsend Radar' ? title : `${title} · Offsend Radar`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description ?? 'Weekly security scan aggregates from Offsend Radar.'} />
+		<title>{fullTitle}</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container">
+				<a class="site-logo" href="/">Offsend Radar</a>
+				<nav class="site-nav">
+					<a href="/" class:list={{ active: activeNav === 'home' }}>Latest</a>
+					<a href="/archive" class:list={{ active: activeNav === 'archive' }}>Archive</a>
+				</nav>
+			</div>
+		</header>
+		<main>
+			<div class="container">
+				<slot />
+			</div>
+		</main>
+		<footer class="site-footer">
+			<div class="container">
+				<span>Fleet security aggregates · no repo names published</span>
+				<a href="https://github.com/Offsend/radar">GitHub</a>
+			</div>
+		</footer>
+	</body>
+</html>

@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	summary: CollectionEntry<'summaries'>;
+}
+
+const { summary } = Astro.props;
+const { cohort } = summary.data;
+---
+
+<div class="grid grid-3">
+	<div class="card">
+		<h3>Targeted</h3>
+		<div class="stat-value">{cohort.targeted}</div>
+		<div class="stat-label">repos in cohort</div>
+	</div>
+	<div class="card">
+		<h3>Scanned</h3>
+		<div class="stat-value">{cohort.scanned}</div>
+		<div class="stat-label">completed this week</div>
+	</div>
+	<div class="card">
+		<h3>Scan complete</h3>
+		<div class="stat-value">{cohort.scanComplete}</div>
+		<div class="stat-label">full scans (in stats)</div>
+	</div>
+	<div class="card">
+		<h3>Skipped</h3>
+		<div class="stat-value">{cohort.skipped}</div>
+		<div class="stat-label">not scanned</div>
+	</div>
+	<div class="card">
+		<h3>Errors</h3>
+		<div class="stat-value">{cohort.errors}</div>
+		<div class="stat-label">scan failures</div>
+	</div>
+	<div class="card">
+		<h3>Exposures</h3>
+		<div class="stat-value">{summary.data.totals.totalExposedFiles}</div>
+		<div class="stat-label">exposed files total</div>
+	</div>
+</div>

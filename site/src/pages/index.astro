@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CohortCard from '../components/CohortCard.astro';
+import IgnoreCoverage from '../components/IgnoreCoverage.astro';
+import ExposedPatterns from '../components/ExposedPatterns.astro';
+import TrendList from '../components/TrendList.astro';
+import { getAllSummaries, getLatestSummary, formatGeneratedAt } from '../lib/summaries';
+
+const summaries = await getAllSummaries();
+const latest = await getLatestSummary();
+---
+
+<BaseLayout title="Offsend Radar" activeNav="home">
+	{latest ? (
+		<>
+			<header class="page-header">
+				<h1>Week {latest.data.week}</h1>
+				<p>
+					Generated {formatGeneratedAt(latest.data.generatedAt)} UTC · tool
+					<span class="mono"> {latest.data.toolVersionRange.join('–')} </span>
+				</p>
+			</header>
+
+			<div class="grid" style="gap: 1.5rem">
+				<CohortCard summary={latest} />
+				<div class="grid grid-2">
+					<ExposedPatterns summary={latest} />
+					<TrendList summaries={summaries} />
+				</div>
+				<IgnoreCoverage summary={latest} />
+			</div>
+		</>
+	) : (
+		<div class="card empty-state">
+			<h1>No reports yet</h1>
+			<p>Weekly summaries will appear after the first Offsend Radar scan.</p>
+		</div>
+	)}
+</BaseLayout>

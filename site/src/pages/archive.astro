@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllSummaries, formatGeneratedAt } from '../lib/summaries';
+
+const summaries = await getAllSummaries();
+---
+
+<BaseLayout title="Archive" activeNav="archive">
+	<header class="page-header">
+		<h1>Archive</h1>
+		<p>All published weekly fleet summaries.</p>
+	</header>
+
+	<div class="card">
+		{summaries.length === 0 ? (
+			<p class="empty-state">No reports published yet.</p>
+		) : (
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Week</th>
+							<th>Generated</th>
+							<th>Scanned</th>
+							<th>Exposures</th>
+							<th>Exposed files</th>
+						</tr>
+					</thead>
+					<tbody>
+						{summaries.map((entry) => (
+							<tr>
+								<td>
+									<a href={`/week/${entry.data.week}`} class="mono">{entry.data.week}</a>
+								</td>
+								<td>{formatGeneratedAt(entry.data.generatedAt)}</td>
+								<td>{entry.data.cohort.scanComplete}</td>
+								<td>{entry.data.totals.reposWithExposures}</td>
+								<td>{entry.data.totals.totalExposedFiles}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		)}
+	</div>
+</BaseLayout>

@@ -1,0 +1,27 @@
+---
+import type { SummaryEntry } from '../lib/summaries';
+
+interface Props {
+	summaries: SummaryEntry[];
+}
+
+const { summaries } = Astro.props;
+---
+
+<div class="card">
+	<h2>Trend</h2>
+	{summaries.length < 2 ? (
+		<p class="empty-state">More weekly reports will appear here as scans accumulate.</p>
+	) : (
+		<ul class="trend-list">
+			{summaries.map((entry) => (
+				<li>
+					<a href={`/week/${entry.data.week}`} class="mono">{entry.data.week}</a>
+					<span>
+						{entry.data.totals.totalExposedFiles} files · {entry.data.cohort.scanComplete} repos
+					</span>
+				</li>
+			))}
+		</ul>
+	)}
+</div>

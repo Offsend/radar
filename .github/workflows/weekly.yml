@@ -1,0 +1,114 @@
+name: Weekly scan
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "ISO week (YYYY-Www). Empty = current UTC week."
+        required: false
+        type: string
+      aggregate_only:
+        description: "Rebuild weekly summary without scanning"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: weekly-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: macos-15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout radar
+        uses: actions/checkout@v4
+
+      - name: Checkout radar-state
+        uses: actions/checkout@v4
+        with:
+          repository: Offsend/radar-state
+          path: state
+          token: ${{ secrets.RADAR_STATE_TOKEN }}
+
+      - name: Install offsend CLI
+        run: brew install Offsend/tap/offsend-cli
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Run weekly scan
+        env:
+          RADAR_STATE_DIR: ${{ github.workspace }}/state
+          GITHUB_TOKEN: ${{ secrets.RADAR_STATE_TOKEN }}
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          args=(python scripts/scan_week.py)
+          if [ -n "${{ inputs.week }}" ]; then
+            args+=(--week "${{ inputs.week }}")
+          fi
+          if [ "${{ inputs.aggregate_only }}" = "true" ]; then
+            args+=(--aggregate-only)
+          fi
+          "${args[@]}"
+
+      - name: Commit radar-state changes
+        if: inputs.aggregate_only != true
+        working-directory: state
+        env:
+          RADAR_STATE_TOKEN: ${{ secrets.RADAR_STATE_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "offsend-radar[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          week="${{ inputs.week }}"
+          if [ -z "$week" ]; then
+            week="$(python3 - <<'PY'
+          from datetime import datetime, timezone
+          print(datetime.now(timezone.utc).strftime("%G-W%V"))
+          PY
+          )"
+          fi
+          git add -A
+          git commit -m "scan: ${week}"
+          git push "https://x-access-token:${RADAR_STATE_TOKEN}@github.com/Offsend/radar-state.git" HEAD:main
+
+      - name: Sync summaries into site
+        if: success()
+        run: python3 scripts/sync_summaries.py --state-dir state
+
+      - name: Commit site data changes
+        if: success()
+        env:
+          RADAR_STATE_TOKEN: ${{ secrets.RADAR_STATE_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "offsend-radar[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet site/src/data/summaries && git diff --cached --quiet site/src/data/summaries; then
+            echo "No site data changes to commit."
+            exit 0
+          fi
+          git add site/src/data/summaries
+          week="${{ inputs.week }}"
+          if [ -z "$week" ]; then
+            week="$(python3 - <<'PY'
+          from datetime import datetime, timezone
+          print(datetime.now(timezone.utc).strftime("%G-W%V"))
+          PY
+          )"
+          fi
+          git commit -m "site: sync summaries for ${week}"
+          git push "https://x-access-token:${RADAR_STATE_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main
