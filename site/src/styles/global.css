@@ -234,6 +234,28 @@ nav.top .brand img {
 	display: block;
 }
 
+nav.top .platform-variants {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 10px;
+}
+
+nav.top .platform-variant {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+}
+
+nav.top .platform-variant-label {
+	font-family: var(--mono);
+	font-size: 9px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--text-dim);
+}
+
 nav.top .platform-wrap {
 	position: relative;
 	display: inline-flex;
@@ -241,90 +263,105 @@ nav.top .platform-wrap {
 	justify-content: center;
 }
 
-nav.top .platform-pulse {
-	position: absolute;
-	inset: 0;
-	border-radius: 999px;
-	background: oklch(0% 0 0 / 0.1);
-	border: none;
-	pointer-events: none;
-	animation-duration: 0.85s;
-	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-	animation-fill-mode: both;
-}
-
-nav.top .platform-pulse:nth-child(1) {
-	animation-name: platform-radar-pulse-1;
-	animation-delay: 0s;
-}
-
-nav.top .platform-pulse:nth-child(2) {
-	animation-name: platform-radar-pulse-2;
-	animation-delay: 0.45s;
-}
-
-nav.top .platform-pulse:nth-child(3) {
-	animation-name: platform-radar-pulse-3;
-	animation-delay: 0.9s;
-}
-
-@keyframes platform-radar-pulse-1 {
-	0% {
-		opacity: 0;
-		transform: scale(1);
-	}
-	25% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 0.18;
-		transform: scale(1.22);
-	}
-}
-
-@keyframes platform-radar-pulse-2 {
-	0% {
-		opacity: 0;
-		transform: scale(1);
-	}
-	25% {
-		opacity: 0.45;
-	}
-	100% {
-		opacity: 0.13;
-		transform: scale(1.5);
-	}
-}
-
-@keyframes platform-radar-pulse-3 {
-	0% {
-		opacity: 0;
-		transform: scale(1);
-	}
-	25% {
-		opacity: 0.4;
-	}
-	100% {
-		opacity: 0.09;
-		transform: scale(1.82);
-	}
-}
-
 nav.top .platform {
 	position: relative;
 	z-index: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	font-family: var(--mono);
 	font-size: 14px;
 	font-weight: 500;
 	color: var(--text);
 	padding: 5px 12px;
-	border-radius: 999px;
+	border-radius: var(--r);
 	background: var(--bg-2);
 	border: 1px solid var(--border);
 }
 
+nav.top .platform-icon {
+	flex-shrink: 0;
+	display: block;
+	color: var(--text-sub);
+}
+
+/* Variant 1: icon — static radar glyph */
+nav.top .platform-wrap--icon .platform {
+	background: var(--brand-gradient-soft);
+	border-color: oklch(0% 0 0 / 0.06);
+}
+
+/* Variant 2: scan line */
+nav.top .platform-wrap--scan {
+	overflow: hidden;
+	border-radius: var(--r);
+}
+
+nav.top .platform-scan-line {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	width: 55%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		oklch(44% 0.14 264 / 0.08) 35%,
+		oklch(44% 0.14 264 / 0.28) 50%,
+		oklch(44% 0.14 264 / 0.08) 65%,
+		transparent 100%
+	);
+	pointer-events: none;
+	animation: platform-scan 2.6s ease-in-out infinite;
+}
+
+@keyframes platform-scan {
+	0% {
+		transform: translateX(-120%);
+		opacity: 0;
+	}
+	8% {
+		opacity: 1;
+	}
+	92% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(220%);
+		opacity: 0;
+	}
+}
+
+/* Variant 3: rotating sweep arc */
+nav.top .platform-wrap--sweep {
+	overflow: hidden;
+	border-radius: var(--r);
+}
+
+nav.top .platform-sweep {
+	position: absolute;
+	inset: -60%;
+	z-index: 0;
+	background: conic-gradient(
+		from 0deg,
+		transparent 0deg,
+		transparent 300deg,
+		oklch(44% 0.14 264 / 0.45) 328deg,
+		oklch(72% 0.08 85 / 0.35) 342deg,
+		transparent 360deg
+	);
+	pointer-events: none;
+	animation: platform-sweep-spin 4s linear infinite;
+}
+
+@keyframes platform-sweep-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
-	nav.top .platform-pulse {
+	nav.top .platform-scan-line,
+	nav.top .platform-sweep {
 		animation: none;
 		display: none;
 	}
@@ -464,7 +501,7 @@ nav.top .topnav-backdrop {
 		padding: 0 16px;
 	}
 
-	nav.top .platform-wrap {
+	nav.top .platform-variants {
 		display: none;
 	}
 
