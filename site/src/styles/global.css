@@ -560,7 +560,7 @@ nav.top .topnav-backdrop {
 		border-bottom: none;
 	}
 
-	nav.top .topnav-backdrop {
+	nav.top.is-menu-open .topnav-backdrop {
 		display: block;
 		position: fixed;
 		inset: 0;

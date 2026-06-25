@@ -1,24 +1,45 @@
-<div class="card report-guide">
-	<h2>How to read this report</h2>
-	<p class="report-guide-lead">These are not confirmed leaks.</p>
-	<p>
-		Radar uses path-level checks to detect files and folders that may become visible to AI coding
-		tools if they are not covered by AI-specific ignore rules.
-	</p>
-	<ul class="report-guide-points">
-		<li>No file contents were read.</li>
-		<li>No secrets were collected.</li>
-		<li>No repository names are published without opt-in.</li>
-	</ul>
-</div>
+<details class="card report-guide">
+	<summary>How to read this report</summary>
+	<div class="report-guide-body">
+		<p class="report-guide-lead">These are not confirmed leaks.</p>
+		<p>
+			Radar uses path-level checks to detect files and folders that may become visible to AI coding
+			tools if they are not covered by AI-specific ignore rules.
+		</p>
+		<ul class="report-guide-points">
+			<li>No file contents were read.</li>
+			<li>No secrets were collected.</li>
+			<li>No repository names are published without opt-in.</li>
+		</ul>
+	</div>
+</details>
 
 <style>
-	.report-guide h2 {
-		margin: 0 0 0.75rem;
+	.report-guide summary {
+		cursor: pointer;
 		font-family: var(--heading);
 		font-size: 1.15rem;
 		font-weight: 700;
 		color: var(--text);
+		list-style: none;
+	}
+
+	.report-guide summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.report-guide summary::before {
+		content: '▸ ';
+		display: inline-block;
+		transition: transform 0.15s ease;
+	}
+
+	.report-guide[open] summary::before {
+		transform: rotate(90deg);
+	}
+
+	.report-guide-body {
+		margin-top: 0.75rem;
 	}
 
 	.report-guide-lead {

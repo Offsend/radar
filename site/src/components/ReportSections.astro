@@ -28,8 +28,8 @@ const { summary, summaries = [], showTrend = false } = Astro.props;
 	>
 		<ReportSummary summary={summary} />
 		<ReportGuide />
-		<MainTakeaway summary={summary} />
 		<CohortCard summary={summary} />
+		<MainTakeaway summary={summary} />
 
 		<div class="grid grid-2 report-insights">
 			<ExposedPatterns summary={summary} />
