@@ -4,12 +4,12 @@ import type { PublicListing } from '../lib/participants';
 
 interface Props {
 	listing: PublicListing;
-	week?: string;
+	reportLabel?: string;
 	compact?: boolean;
 	reportTitle?: string;
 }
 
-const { listing, week, compact = false, reportTitle = "This week's scan" } = Astro.props;
+const { listing, reportLabel, compact = false, reportTitle = "This week's scan" } = Astro.props;
 
 const ignorePresent = Object.entries(listing.ignoreFilesPresent)
 	.filter(([, present]) => present)
@@ -27,7 +27,7 @@ const exposedFiles = listing.totals.exposedFiles ?? 0;
 
 	<div class="report-block">
 		<h4 class="report-block-title">{reportTitle}</h4>
-		{week && <p class="report-week">Week <span class="mono">{week}</span></p>}
+		{reportLabel && <p class="report-week">{reportLabel}</p>}
 
 		{patterns.length === 0 ? (
 			<p class="report-text">No AI-context risk signal categories detected.</p>

@@ -115,10 +115,62 @@ export function getTopRiskSignalCategory(summary: SummaryEntry): string | undefi
 	return patterns[0] ? formatPatternLabel(patterns[0].id) : undefined;
 }
 
-export function getReportLabel(summaries: SummaryEntry[], week: string): string {
+export function getReportNumber(summaries: SummaryEntry[], week: string): number | undefined {
 	const sorted = [...summaries].sort((a, b) => a.data.week.localeCompare(b.data.week));
 	const index = sorted.findIndex((entry) => entry.data.week === week);
-	return index >= 0 ? `Radar #${index + 1}` : week;
+	return index >= 0 ? index + 1 : undefined;
+}
+
+export function getReportLabel(summaries: SummaryEntry[], week: string): string {
+	const number = getReportNumber(summaries, week);
+	return number !== undefined ? `Radar #${number}` : week;
+}
+
+export function formatIsoWeekRange(weekId: string): string | undefined {
+	const match = weekId.match(/^(\d{4})-W(\d{2})$/);
+	if (!match) return undefined;
+
+	const year = Number(match[1]);
+	const week = Number(match[2]);
+
+	const jan4 = new Date(Date.UTC(year, 0, 4));
+	const jan4Day = jan4.getUTCDay() || 7;
+	const week1Monday = new Date(jan4);
+	week1Monday.setUTCDate(jan4.getUTCDate() - (jan4Day - 1));
+
+	const monday = new Date(week1Monday);
+	monday.setUTCDate(week1Monday.getUTCDate() + (week - 1) * 7);
+
+	const sunday = new Date(monday);
+	sunday.setUTCDate(monday.getUTCDate() + 6);
+
+	const monthDay = (date: Date) =>
+		date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+
+	if (monday.getUTCMonth() === sunday.getUTCMonth()) {
+		return `${monthDay(monday)}–${sunday.getUTCDate()}, ${monday.getUTCFullYear()}`;
+	}
+
+	return `${monthDay(monday)} – ${monthDay(sunday)}, ${sunday.getUTCFullYear()}`;
+}
+
+export function formatReportHeading(
+	summaries: SummaryEntry[],
+	week: string,
+): { title: string; tagline?: string } {
+	const number = getReportNumber(summaries, week);
+	if (number === undefined) return { title: week };
+
+	const taglineParts: string[] = [];
+	if (number === 1) taglineParts.push('First report');
+
+	const dateRange = formatIsoWeekRange(week);
+	if (dateRange) taglineParts.push(dateRange);
+
+	return {
+		title: getReportLabel(summaries, week),
+		tagline: taglineParts.length > 0 ? taglineParts.join(' · ') : undefined,
+	};
 }
 
 export function buildReportSummary(summary: SummaryEntry): string[] {

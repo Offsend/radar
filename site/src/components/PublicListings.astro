@@ -1,14 +1,17 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import ListingReport from './ListingReport.astro';
+import type { SummaryEntry } from '../lib/summaries';
+import { getReportLabel } from '../lib/summaries';
 
 interface Props {
 	summary: CollectionEntry<'summaries'>;
+	summaries?: SummaryEntry[];
 }
 
-const { summary } = Astro.props;
+const { summary, summaries = [] } = Astro.props;
 const listings = summary.data.publicListings ?? [];
-const week = summary.data.week;
+const reportLabel = getReportLabel(summaries, summary.data.week);
 ---
 
 {listings.length === 0 ? (
@@ -26,7 +29,7 @@ const week = summary.data.week;
 		<ul class="listing-list">
 			{listings.map((listing) => (
 				<li class="listing-list-item">
-					<ListingReport listing={listing} week={week} />
+					<ListingReport listing={listing} reportLabel={reportLabel} />
 				</li>
 			))}
 		</ul>

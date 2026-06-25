@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "week": "2026-W26",
+  "generatedAt": "2026-06-24T19:57:31Z",
+  "toolVersionRange": [
+    "0.8.0",
+    "0.8.0"
+  ],
+  "rulesetVersions": [
+    "6f8fef790c56173d"
+  ],
+  "cohort": {
+    "targeted": 32,
+    "scanned": 32,
+    "skipped": 0,
+    "errors": 0,
+    "scanComplete": 32
+  },
+  "ignoreFilesPresent": {
+    "agents-md": {
+      "present": 8,
+      "total": 32,
+      "pct": 0.25
+    },
+    "aider-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "claude-ignore": {
+      "present": 1,
+      "total": 32,
+      "pct": 0.0312
+    },
+    "claude-md": {
+      "present": 8,
+      "total": 32,
+      "pct": 0.25
+    },
+    "cline-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "codeium-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "cody-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "continue-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "copilot-exclude": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "cursor-ignore": {
+      "present": 1,
+      "total": 32,
+      "pct": 0.0312
+    },
+    "cursor-indexing-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "cursor-project-rules": {
+      "present": 1,
+      "total": 32,
+      "pct": 0.0312
+    },
+    "gemini-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "git-ignore": {
+      "present": 32,
+      "total": 32,
+      "pct": 1.0
+    },
+    "llm-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "roo-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    },
+    "zed-ignore": {
+      "present": 0,
+      "total": 32,
+      "pct": 0.0
+    }
+  },
+  "exposedPatterns": [
+    {
+      "id": "db-dumps",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "local-databases",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "android-keystore",
+      "category": "signing",
+      "severity": "recommended",
+      "reposAffected": 1,
+      "totalCount": 2
+    },
+    {
+      "id": "npmrc-files",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 4,
+      "totalCount": 9
+    },
+    {
+      "id": "pkcs12-p12",
+      "category": "signing",
+      "severity": "recommended",
+      "reposAffected": 1,
+      "totalCount": 2
+    },
+    {
+      "id": "terraform-vars",
+      "category": "cloud",
+      "severity": "recommended",
+      "reposAffected": 1,
+      "totalCount": 2
+    },
+    {
+      "id": "env-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 5,
+      "totalCount": 9
+    },
+    {
+      "id": "key-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 2,
+      "totalCount": 28
+    },
+    {
+      "id": "pem-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 4,
+      "totalCount": 22
+    }
+  ],
+  "totals": {
+    "reposWithExposures": 10,
+    "totalExposedFiles": 76
+  },
+  "publicListings": [
+    {
+      "repo": "Offsend/Offsend",
+      "url": "https://github.com/Offsend/Offsend",
+      "label": "AI Context Reviewed",
+      "scanComplete": true,
+      "toolVersion": "0.8.0",
+      "ignoreFilesPresent": {
+        "agents-md": false,
+        "aider-ignore": false,
+        "claude-ignore": true,
+        "claude-md": false,
+        "cline-ignore": false,
+        "codeium-ignore": false,
+        "cody-ignore": false,
+        "continue-ignore": false,
+        "copilot-exclude": false,
+        "cursor-ignore": true,
+        "cursor-indexing-ignore": false,
+        "cursor-project-rules": false,
+        "gemini-ignore": false,
+        "git-ignore": true,
+        "llm-ignore": false,
+        "roo-ignore": false,
+        "zed-ignore": false
+      },
+      "exposedPatterns": [],
+      "totals": {
+        "exposedFiles": 0,
+        "exposedPatternTypes": 0
+      }
+    },
+    {
+      "repo": "Offsend/browser-extension",
+      "url": "https://github.com/Offsend/browser-extension",
+      "label": "AI Context Reviewed",
+      "scanComplete": true,
+      "toolVersion": "0.8.0",
+      "ignoreFilesPresent": {
+        "agents-md": false,
+        "aider-ignore": false,
+        "claude-ignore": false,
+        "claude-md": false,
+        "cline-ignore": false,
+        "codeium-ignore": false,
+        "cody-ignore": false,
+        "continue-ignore": false,
+        "copilot-exclude": false,
+        "cursor-ignore": false,
+        "cursor-indexing-ignore": false,
+        "cursor-project-rules": false,
+        "gemini-ignore": false,
+        "git-ignore": true,
+        "llm-ignore": false,
+        "roo-ignore": false,
+        "zed-ignore": false
+      },
+      "exposedPatterns": [],
+      "totals": {
+        "exposedFiles": 0,
+        "exposedPatternTypes": 0
+      }
+    }
+  ]
+}

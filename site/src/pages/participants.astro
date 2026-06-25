@@ -2,8 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ListingReport from '../components/ListingReport.astro';
 import { getAllTimeParticipants } from '../lib/participants';
+import { getAllSummaries, getReportLabel } from '../lib/summaries';
 
 const participants = await getAllTimeParticipants();
+const summaries = await getAllSummaries();
+const chronological = [...summaries].sort((a, b) => a.data.week.localeCompare(b.data.week));
 ---
 
 <BaseLayout
@@ -34,7 +37,7 @@ const participants = await getAllTimeParticipants();
 				<section class="participant-section">
 					<ListingReport
 						listing={participant.latestListing}
-						week={participant.lastWeek}
+						reportLabel={getReportLabel(chronological, participant.lastWeek)}
 						reportTitle="Latest scan"
 					/>
 					<div class="participant-meta card">
@@ -42,14 +45,14 @@ const participants = await getAllTimeParticipants();
 						<ul class="week-links">
 							{participant.weeks.map((week) => (
 								<li>
-									<a href={`/week/${week}`} class="mono">{week}</a>
+									<a href={`/week/${week}`}>{getReportLabel(chronological, week)}</a>
 								</li>
 							))}
 						</ul>
 						{participant.weeks.length > 1 && (
 							<p class="participant-meta-note">
-								First appearance: <span class="mono">{participant.firstWeek}</span> · Latest:{' '}
-								<span class="mono">{participant.lastWeek}</span>
+								First appearance: {getReportLabel(chronological, participant.firstWeek)} · Latest:{' '}
+								{getReportLabel(chronological, participant.lastWeek)}
 							</p>
 						)}
 					</div>

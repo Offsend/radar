@@ -1,11 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getAllSummaries, formatGeneratedAt } from '../lib/summaries';
+import { getAllSummaries, formatGeneratedAt, getReportLabel } from '../lib/summaries';
 
 const summaries = await getAllSummaries();
+const chronological = [...summaries].sort((a, b) => a.data.week.localeCompare(b.data.week));
 ---
 
-<BaseLayout title="Archive" activeNav="archive">
+<BaseLayout
+	title="Archive"
+	activeNav="archive"
+	description="All published Offsend Radar fleet reports — weekly AI-context hygiene scans with anonymous aggregates."
+>
 	<header class="page-header">
 		<h1>Archive</h1>
 		<p>All published weekly fleet summaries.</p>
@@ -19,7 +24,7 @@ const summaries = await getAllSummaries();
 				<table>
 					<thead>
 						<tr>
-							<th>Week</th>
+							<th>Report</th>
 							<th>Generated</th>
 							<th>Scanned</th>
 							<th>Risk signals</th>
@@ -30,7 +35,8 @@ const summaries = await getAllSummaries();
 						{summaries.map((entry) => (
 							<tr>
 								<td>
-									<a href={`/week/${entry.data.week}`} class="mono">{entry.data.week}</a>
+									<a href={`/week/${entry.data.week}`}>{getReportLabel(chronological, entry.data.week)}</a>
+									<span class="report-week-id mono">{entry.data.week}</span>
 								</td>
 								<td>{formatGeneratedAt(entry.data.generatedAt)}</td>
 								<td>{entry.data.cohort.scanComplete}</td>

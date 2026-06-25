@@ -1,18 +1,33 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ReportSections from '../components/ReportSections.astro';
-import { getAllSummaries, getLatestSummary, formatGeneratedAt } from '../lib/summaries';
+import {
+	getAllSummaries,
+	getLatestSummary,
+	formatGeneratedAt,
+	formatReportHeading,
+} from '../lib/summaries';
+import { buildSummaryPageDescription } from '../lib/seo';
 
 const summaries = await getAllSummaries();
 const latest = await getLatestSummary();
+const heading = latest ? formatReportHeading(summaries, latest.data.week) : undefined;
+const pageDescription = latest ? buildSummaryPageDescription(latest) : undefined;
 ---
 
-<BaseLayout title="Offsend Radar" activeNav="home">
+<BaseLayout
+	title="Offsend Radar"
+	activeNav="home"
+	description={pageDescription}
+>
 	{latest ? (
 		<>
 			<header class="page-header">
-				<h1>Week {latest.data.week}</h1>
-				<p>Published {formatGeneratedAt(latest.data.generatedAt)} UTC</p>
+				<h1>{heading?.title}</h1>
+				<p>
+					{heading?.tagline && <>{heading.tagline} · </>}
+					Published {formatGeneratedAt(latest.data.generatedAt)} UTC
+				</p>
 			</header>
 
 			<ReportSections summary={latest} summaries={summaries} showTrend />

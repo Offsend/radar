@@ -1,14 +1,28 @@
 ---
 import '../styles/global.css';
+import {
+	SITE_NAME,
+	DEFAULT_DESCRIPTION,
+	DEFAULT_OG_IMAGE,
+	buildWebsiteSchema,
+	canonicalUrl,
+	absoluteAssetUrl,
+} from '../lib/seo';
 
 interface Props {
 	title: string;
 	description?: string;
-	activeNav?: 'home' | 'archive' | 'participants';
+	activeNav?: 'home' | 'archive' | 'participants' | 'methodology';
+	ogImage?: string;
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description, activeNav } = Astro.props;
-const fullTitle = title === 'Offsend Radar' ? title : `${title} · Offsend Radar`;
+const { title, description, activeNav, ogImage = DEFAULT_OG_IMAGE, jsonLd } = Astro.props;
+const fullTitle = title === SITE_NAME ? title : `${title} · ${SITE_NAME}`;
+const metaDescription = description ?? DEFAULT_DESCRIPTION;
+const canonical = canonicalUrl(Astro.url.pathname);
+const ogImageUrl = absoluteAssetUrl(ogImage);
+const structuredData = [buildWebsiteSchema(), ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
 ---
 
 <!doctype html>
@@ -18,14 +32,24 @@ const fullTitle = title === 'Offsend Radar' ? title : `${title} · Offsend Radar
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content={description ?? 'Weekly security scan aggregates from Offsend Radar.'} />
+		<meta name="description" content={metaDescription} />
+		<link rel="canonical" href={canonical} />
 		<title>{fullTitle}</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap"
-			rel="stylesheet"
-		/>
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={SITE_NAME} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={metaDescription} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:locale" content="en_US" />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={metaDescription} />
+		<meta name="twitter:image" content={ogImageUrl} />
+
+		<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 	</head>
 	<body>
 		<div class="gridfx" aria-hidden="true"></div>
@@ -54,6 +78,7 @@ const fullTitle = title === 'Offsend Radar' ? title : `${title} · Offsend Radar
 					<a href="/" class:list={{ active: activeNav === 'home' }}>Latest</a>
 					<a href="/archive" class:list={{ active: activeNav === 'archive' }}>Archive</a>
 					<a href="/participants" class:list={{ active: activeNav === 'participants' }}>Participants</a>
+					<a href="/methodology" class:list={{ active: activeNav === 'methodology' }}>Methodology</a>
 					<a href="https://offsend.io">Product</a>
 					<a
 						class="topnav-github"
@@ -82,6 +107,7 @@ const fullTitle = title === 'Offsend Radar' ? title : `${title} · Offsend Radar
 			<div class="container row">
 				<span class="copyright">Anonymous fleet aggregates by default · named listings are maintainer opt-in</span>
 				<div class="links">
+					<a href="/methodology">Methodology</a>
 					<a href="https://offsend.io">Offsend</a>
 					<a href="https://github.com/Offsend/radar" target="_blank" rel="noopener noreferrer">GitHub</a>
 				</div>

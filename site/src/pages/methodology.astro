@@ -1,0 +1,182 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const description =
+	'How Offsend Radar selects repositories, what path-level checks run, what is never published, and how maintainers opt in to named listings.';
+---
+
+<BaseLayout title="Methodology" activeNav="methodology" {description}>
+	<header class="page-header">
+		<h1>Methodology</h1>
+		<p>
+			Offsend Radar publishes weekly, public-safe aggregates about AI-context hygiene in open-source
+			repositories. This page explains what we scan, what we exclude, and how results reach the
+			dashboard.
+		</p>
+	</header>
+
+	<div class="methodology-grid">
+		<section class="card">
+			<h2>What we scan</h2>
+			<p>
+				Each week the orchestrator clones target repositories and runs
+				<a href="https://offsend.io/">offsend report</a> — the same public-safe mode available in the
+				Offsend CLI. Checks are path-level only:
+			</p>
+			<ul>
+				<li>
+					<strong>Exposed patterns</strong> — sensitive file categories (e.g. <code>.env</code>, key
+					material) visible at the path level
+				</li>
+				<li>
+					<strong>Ignore file coverage</strong> — presence of AI-oriented ignore files (<code
+						>.cursorignore</code
+					>, <code>.claudeignore</code>, project rules, and similar)
+				</li>
+			</ul>
+			<p>Scans use shallow clones of a single ref per repository from the weekly cohort list.</p>
+		</section>
+
+		<section class="card">
+			<h2>What we do not scan or publish</h2>
+			<ul>
+				<li>File contents, secret values, tokens, or credentials</li>
+				<li>Exact file paths or filenames in public exports</li>
+				<li>Repository names alongside findings unless the maintainer opted in</li>
+				<li>Claims of security, compliance, or “secret-free” status</li>
+			</ul>
+			<p>
+				Private orchestration metadata stays in the private
+				<a href="https://github.com/Offsend/radar-state">radar-state</a> repository and is never copied
+				to public exports — except for opted-in named listings.
+			</p>
+		</section>
+
+		<section class="card">
+			<h2>How repositories are selected</h2>
+			<p>
+				Weekly cohorts are defined manually in <code>radar-state/targets/&lt;week&gt;.yml</code> — typically
+				open-source repositories the Offsend team tracks or that maintainers opt into. Repos can be
+				skipped when archived or deprecated.
+			</p>
+		</section>
+
+		<section class="card">
+			<h2>Named public listings</h2>
+			<p>
+				Repository names appear on this site only when a maintainer has consented via
+				<code>radar-state/registry/public-listings.yml</code>. Listings use positive framing (e.g.
+				“AI Context Reviewed”), not blame-oriented labels. Fleet aggregates remain anonymous.
+			</p>
+			<p>
+				<a href="https://github.com/Offsend/radar#named-public-listings-maintainer-opt-in"
+					>How to opt in →</a
+				>
+			</p>
+		</section>
+
+		<section class="card">
+			<h2>How results are sanitized</h2>
+			<ol>
+				<li><code>offsend report</code> produces anonymized per-repo JSON (pattern IDs and counts, no paths).</li>
+				<li>Fleet aggregates roll up counts across repos in the private data store.</li>
+				<li>
+					<code>export/&lt;week&gt;/summary.json</code> is the public-safe subset — fleet aggregates plus
+					opted-in listings.
+				</li>
+				<li>This site renders only the export data.</li>
+			</ol>
+		</section>
+
+		<section class="card">
+			<h2>Reproduce checks locally</h2>
+			<pre class="methodology-code"><code>brew install --cask offsend/tap/offsend-cli
+offsend show
+offsend report . --out report.json</code></pre>
+			<p>Everything runs locally. No file contents are uploaded.</p>
+		</section>
+
+		<section class="card">
+			<h2>Principles</h2>
+			<ul>
+				<li><strong>Path-level by default</strong> — structure and ignore files, not file contents</li>
+				<li><strong>No secrets collection</strong> — reports must not contain sensitive values</li>
+				<li><strong>No public shaming</strong> — aggregate patterns, not individual blame</li>
+				<li><strong>Opt-in for names</strong> — maintainers choose whether to appear by name</li>
+				<li><strong>No security claims</strong> — hygiene signals only, not certification</li>
+			</ul>
+		</section>
+	</div>
+</BaseLayout>
+
+<style>
+	.methodology-grid {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.methodology-grid h2 {
+		margin: 0 0 0.75rem;
+		font-family: var(--heading);
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--text);
+	}
+
+	.methodology-grid p,
+	.methodology-grid li {
+		margin: 0;
+		font-size: 0.95rem;
+		color: var(--text-sub);
+		line-height: 1.55;
+	}
+
+	.methodology-grid p + p,
+	.methodology-grid ul,
+	.methodology-grid ol {
+		margin-top: 0.75rem;
+	}
+
+	.methodology-grid ul,
+	.methodology-grid ol {
+		padding-left: 1.15rem;
+	}
+
+	.methodology-grid li + li {
+		margin-top: 0.35rem;
+	}
+
+	.methodology-grid a {
+		color: var(--blue-text);
+		font-weight: 500;
+	}
+
+	.methodology-grid a:hover {
+		text-decoration: underline;
+	}
+
+	.methodology-grid :global(code) {
+		font-family: var(--mono);
+		font-size: 0.88em;
+		background: var(--bg-2);
+		padding: 0.1em 0.35em;
+		border-radius: 4px;
+	}
+
+	.methodology-code {
+		margin: 0.75rem 0 0;
+		padding: 0.85rem 1rem;
+		background: var(--bg-2);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		overflow-x: auto;
+	}
+
+	.methodology-code code {
+		font-family: var(--mono);
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--text);
+		white-space: pre;
+	}
+</style>

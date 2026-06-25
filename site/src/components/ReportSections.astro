@@ -50,7 +50,7 @@ const { summary, summaries = [], showTrend = false } = Astro.props;
 		description="Per-repository reports for maintainers who opted in. Fleet counts above stay anonymous; each card below is that repo's own scan."
 		variant="participants"
 	>
-		<PublicListings summary={summary} />
+		<PublicListings summary={summary} summaries={summaries} />
 	</SectionGroup>
 
 	<CliCta />

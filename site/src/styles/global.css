@@ -1,3 +1,5 @@
+@import './fonts.css';
+
 /* ─── tokens (from offsend.io landing) ─────────────────────────────────── */
 :root {
 	--bg: oklch(99% 0.004 250);
@@ -750,6 +752,13 @@ td a.mono {
 
 td a.mono:hover {
 	text-decoration: underline;
+}
+
+.report-week-id {
+	display: block;
+	margin-top: 0.15rem;
+	font-size: 0.75rem;
+	color: var(--text-mut);
 }
 
 .bar-row {

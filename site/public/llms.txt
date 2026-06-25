@@ -1,0 +1,36 @@
+# Offsend Radar
+
+> Weekly public research on AI-context hygiene in open-source repositories — path-level checks, anonymous fleet aggregates, no secrets collected.
+
+Offsend Radar is part of [Offsend](https://offsend.io/), a local-first CLI for controlling what AI coding tools can read. The dashboard publishes sanitized weekly scan aggregates at https://radar.offsend.io.
+
+## Key pages
+
+- [Latest report](https://radar.offsend.io/): Most recent fleet scan — repos scanned, AI ignore coverage, risk signal categories
+- [Archive](https://radar.offsend.io/archive/): All published weekly reports
+- [Methodology](https://radar.offsend.io/methodology/): What is scanned, what is not scanned, and how results are sanitized
+- [Participants](https://radar.offsend.io/participants/): Repositories whose maintainers opted in to named listings
+- [GitHub](https://github.com/Offsend/radar): Orchestrator source and opt-in instructions
+
+## Methodology summary
+
+- Path-level checks only — no file contents read, no secrets collected
+- Fleet aggregates are anonymous by default; repository names appear only with maintainer opt-in
+- Scans use the same public-safe `offsend report` mode as the Offsend CLI
+- Reports cover exposed path categories (e.g. .env, key material) and AI ignore file coverage (.cursorignore, .claudeignore, etc.)
+- Radar does not certify security or claim repositories are secret-free
+
+## Reproduce locally
+
+```bash
+brew install --cask offsend/tap/offsend-cli
+offsend show
+offsend report . --out report.json
+```
+
+Everything runs locally. No file contents are uploaded.
+
+## Contact
+
+- Product: https://offsend.io
+- Source: https://github.com/Offsend/radar
