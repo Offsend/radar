@@ -1,0 +1,98 @@
+---
+import type { SummaryEntry } from '../lib/summaries';
+import {
+	formatPct,
+	getDedicatedAiIgnoreCoverage,
+	getReportLabel,
+	getTopRiskSignalCategory,
+} from '../lib/summaries';
+
+interface Props {
+	summary: SummaryEntry;
+	summaries: SummaryEntry[];
+}
+
+const { summary, summaries } = Astro.props;
+
+const chronological = [...summaries].sort((a, b) => a.data.week.localeCompare(b.data.week));
+const currentIndex = chronological.findIndex((entry) => entry.data.week === summary.data.week);
+const previous = currentIndex > 0 ? chronological[currentIndex - 1] : undefined;
+const next =
+	currentIndex >= 0 && currentIndex < chronological.length - 1
+		? chronological[currentIndex + 1]
+		: undefined;
+const isFirstReport = chronological.length === 1;
+
+const left = previous ?? summary;
+const right = previous ? summary : next;
+
+const leftLabel = getReportLabel(chronological, left.data.week);
+const rightLabel = right ? getReportLabel(chronological, right.data.week) : 'Radar #2';
+
+function metricValue(entry: SummaryEntry | undefined, getter: (entry: SummaryEntry) => string | number) {
+	if (!entry) return 'TBD';
+	return getter(entry);
+}
+---
+
+<div class="card report-comparison">
+	<h2>Compared with previous report</h2>
+	{isFirstReport ? (
+		<p class="comparison-note">This is the first published Radar report. Values for the next report will appear here.</p>
+	) : null}
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Metric</th>
+					<th>{leftLabel}</th>
+					<th>{rightLabel}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Repositories scanned</td>
+					<td>{left.data.cohort.scanComplete}</td>
+					<td>{metricValue(right, (entry) => entry.data.cohort.scanComplete)}</td>
+				</tr>
+				<tr>
+					<td>Dedicated AI ignore coverage</td>
+					<td>{formatPct(getDedicatedAiIgnoreCoverage(left))}</td>
+					<td>{metricValue(right, (entry) => formatPct(getDedicatedAiIgnoreCoverage(entry)))}</td>
+				</tr>
+				<tr>
+					<td>AI-context risk signals</td>
+					<td>{left.data.totals.totalExposedFiles}</td>
+					<td>{metricValue(right, (entry) => entry.data.totals.totalExposedFiles)}</td>
+				</tr>
+				<tr>
+					<td>Top category</td>
+					<td>{getTopRiskSignalCategory(left) ?? '—'}</td>
+					<td>{metricValue(right, (entry) => getTopRiskSignalCategory(entry) ?? '—')}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<style>
+	.report-comparison h2 {
+		margin: 0 0 0.75rem;
+		font-family: var(--heading);
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--text);
+	}
+
+	.comparison-note {
+		margin: 0 0 0.75rem;
+		font-size: 0.9rem;
+		color: var(--text-mut);
+		line-height: 1.45;
+	}
+
+	.report-comparison th:not(:first-child),
+	.report-comparison td:not(:first-child) {
+		text-align: right;
+	}
+</style>

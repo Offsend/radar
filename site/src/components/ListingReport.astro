@@ -30,11 +30,11 @@ const exposedFiles = listing.totals.exposedFiles ?? 0;
 		{week && <p class="report-week">Week <span class="mono">{week}</span></p>}
 
 		{patterns.length === 0 ? (
-			<p class="report-text">No exposed file categories detected.</p>
+			<p class="report-text">No AI-context risk signal categories detected.</p>
 		) : (
 			<>
 				<p class="report-text">
-					{exposedFiles} exposed {exposedFiles === 1 ? 'file' : 'files'} across{' '}
+					{exposedFiles} AI-context risk signal{exposedFiles === 1 ? '' : 's'} across{' '}
 					{patterns.length} {patterns.length === 1 ? 'category' : 'categories'}:
 				</p>
 				<ul class="finding-list">

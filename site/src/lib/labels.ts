@@ -13,6 +13,7 @@ const PATTERN_LABELS: Record<string, string> = {
 
 const IGNORE_LABELS: Record<string, string> = {
 	'agents-md': 'AGENTS.md',
+	'ai-exclude': '.aiexclude',
 	'aider-ignore': '.aiderignore',
 	'claude-ignore': '.claudeignore',
 	'claude-md': 'CLAUDE.md',
@@ -25,7 +26,7 @@ const IGNORE_LABELS: Record<string, string> = {
 	'cursor-indexing-ignore': '.cursorindexingignore',
 	'cursor-project-rules': 'Cursor project rules',
 	'gemini-ignore': '.geminiignore',
-	'git-ignore': '.gitignore (AI-related)',
+	'git-ignore': '.gitignore',
 	'llm-ignore': '.llmignore',
 	'roo-ignore': '.rooignore',
 	'zed-ignore': '.zedignore',

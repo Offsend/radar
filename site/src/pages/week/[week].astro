@@ -11,6 +11,7 @@ export async function getStaticPaths() {
 }
 
 const { week } = Astro.params;
+const summaries = await getAllSummaries();
 const summary = week ? await getSummaryByWeek(week) : undefined;
 
 if (!summary) {
@@ -24,5 +25,5 @@ if (!summary) {
 		<p>Published {formatGeneratedAt(summary.data.generatedAt)} UTC</p>
 	</header>
 
-	<ReportSections summary={summary} />
+	<ReportSections summary={summary} summaries={summaries} />
 </BaseLayout>

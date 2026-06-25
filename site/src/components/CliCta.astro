@@ -1,0 +1,47 @@
+<section class="cli-cta card">
+	<h2>Check your own project</h2>
+	<p>Run the same local check with Offsend CLI:</p>
+	<pre class="cli-cta-code"><code>brew install --cask offsend/tap/offsend-cli
+offsend show
+offsend prepare --dry-run</code></pre>
+	<p class="cli-cta-note">Everything runs locally. No file contents are uploaded.</p>
+</section>
+
+<style>
+	.cli-cta h2 {
+		margin: 0 0 0.5rem;
+		font-family: var(--heading);
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--text);
+	}
+
+	.cli-cta p {
+		margin: 0;
+		font-size: 0.95rem;
+		color: var(--text-sub);
+		line-height: 1.5;
+	}
+
+	.cli-cta-code {
+		margin: 0.75rem 0;
+		padding: 0.85rem 1rem;
+		background: var(--bg-2);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		overflow-x: auto;
+	}
+
+	.cli-cta-code code {
+		font-family: var(--mono);
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--text);
+		white-space: pre;
+	}
+
+	.cli-cta-note {
+		font-size: 0.88rem;
+		color: var(--text-mut);
+	}
+</style>

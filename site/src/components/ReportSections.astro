@@ -1,9 +1,13 @@
 ---
 import type { SummaryEntry } from '../lib/summaries';
+import CliCta from './CliCta.astro';
 import CohortCard from './CohortCard.astro';
 import ExposedPatterns from './ExposedPatterns.astro';
 import IgnoreCoverage from './IgnoreCoverage.astro';
+import MainTakeaway from './MainTakeaway.astro';
 import PublicListings from './PublicListings.astro';
+import ReportComparison from './ReportComparison.astro';
+import ReportGuide from './ReportGuide.astro';
 import ReportSummary from './ReportSummary.astro';
 import SectionGroup from './SectionGroup.astro';
 import TrendList from './TrendList.astro';
@@ -23,6 +27,8 @@ const { summary, summaries = [], showTrend = false } = Astro.props;
 		description="Anonymous counts across all complete scans this week. No repository names are shown."
 	>
 		<ReportSummary summary={summary} />
+		<ReportGuide />
+		<MainTakeaway summary={summary} />
 		<CohortCard summary={summary} />
 
 		<div class="grid grid-2 report-insights">
@@ -37,6 +43,8 @@ const { summary, summaries = [], showTrend = false } = Astro.props;
 		{showTrend && <IgnoreCoverage summary={summary} />}
 	</SectionGroup>
 
+	{summaries.length > 0 && <ReportComparison summary={summary} summaries={summaries} />}
+
 	<SectionGroup
 		title="Named participants"
 		description="Per-repository reports for maintainers who opted in. Fleet counts above stay anonymous; each card below is that repo's own scan."
@@ -44,6 +52,8 @@ const { summary, summaries = [], showTrend = false } = Astro.props;
 	>
 		<PublicListings summary={summary} />
 	</SectionGroup>
+
+	<CliCta />
 </div>
 
 <style>

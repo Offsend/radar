@@ -19,6 +19,7 @@ from typing import Any
 import yaml
 
 SCHEMA_VERSION = 1
+GIT_IGNORE_RULE_ID = "git-ignore"
 SLUG_RE = re.compile(r"^[^/]+/[^/]+$")
 
 
@@ -287,6 +288,8 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
     tool_versions: list[str] = []
     repos_with_exposures = 0
     total_exposed_files = 0
+    repos_with_git_ignore = 0
+    repos_with_dedicated_ai_ignore = 0
 
     for report in reports:
         tool_version = report.get("toolVersion")
@@ -311,10 +314,20 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
                 pattern_stats[key]["reposAffected"] += 1
                 seen_patterns.add(key)
 
-        for rule_id, present in (report.get("ignoreFilesPresent") or {}).items():
+        ignore_present = report.get("ignoreFilesPresent") or {}
+        for rule_id, present in ignore_present.items():
             ignore_stats[rule_id]["total"] += 1
             if present:
                 ignore_stats[rule_id]["present"] += 1
+
+        if ignore_present.get(GIT_IGNORE_RULE_ID):
+            repos_with_git_ignore += 1
+        if any(
+            present
+            for rule_id, present in ignore_present.items()
+            if rule_id != GIT_IGNORE_RULE_ID and present
+        ):
+            repos_with_dedicated_ai_ignore += 1
 
     exposed_patterns = [
         {
@@ -353,6 +366,12 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
             "scanComplete": len(complete_rows),
         },
         "ignoreFilesPresent": ignore_files_present,
+        "ignoreCoverage": {
+            "gitIgnorePct": round(repos_with_git_ignore / len(reports), 4) if reports else 0.0,
+            "dedicatedAiIgnorePct": round(repos_with_dedicated_ai_ignore / len(reports), 4)
+            if reports
+            else 0.0,
+        },
         "exposedPatterns": exposed_patterns,
         "totals": {
             "reposWithExposures": repos_with_exposures,

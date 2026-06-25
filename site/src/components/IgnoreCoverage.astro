@@ -1,70 +1,94 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { formatIgnoreLabel } from '../lib/labels';
-import { formatPct, getAllIgnoreRules, getNonZeroIgnoreRules } from '../lib/summaries';
+import {
+	formatPct,
+	getAllIgnoreRules,
+	getDedicatedAiIgnoreCoverage,
+	getNonZeroIgnoreRules,
+	getPriorityDedicatedIgnoreRules,
+} from '../lib/summaries';
 
 interface Props {
 	summary: CollectionEntry<'summaries'>;
-	previewLimit?: number;
 }
 
-const { summary, previewLimit = 5 } = Astro.props;
+const { summary } = Astro.props;
 
+const dedicatedCoverage = getDedicatedAiIgnoreCoverage(summary);
+const priorityRules = getPriorityDedicatedIgnoreRules(summary);
 const nonZeroRules = getNonZeroIgnoreRules(summary);
-const previewRules = nonZeroRules.slice(0, previewLimit);
 const allRules = getAllIgnoreRules(summary);
-const hasMoreRules = allRules.length > previewRules.length;
+const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) => priorityId === id));
 ---
 
 <div class="card">
-	<h2>AI ignore file coverage</h2>
-	{nonZeroRules.length === 0 ? (
-		<p class="empty-state-inline">No AI ignore files detected in scanned repositories.</p>
-	) : (
-		<>
-			{previewRules.map(([id, rule]) => (
-				<div class="bar-row">
-					<span class="bar-label">{formatIgnoreLabel(id)}</span>
-					<div class="bar-track">
-						<div class="bar-fill" style={`width: ${Math.round(rule.pct * 100)}%`} />
-					</div>
-					<span class="bar-pct">{formatPct(rule.pct)}</span>
-				</div>
-			))}
+	<h2>Dedicated AI ignore files</h2>
+	<p class="coverage-summary">
+		<span class="coverage-stat">
+			<strong>{formatPct(dedicatedCoverage)}</strong> dedicated AI ignore coverage
+		</span>
+	</p>
+	<p class="coverage-insight">
+		Developers already have a `.gitignore` habit. Dedicated AI ignore files are still rare.
+	</p>
 
-			{hasMoreRules && (
-				<details class="ignore-details">
-					<summary>
-						Show all {allRules.length} ignore types
-						{nonZeroRules.length < allRules.length &&
-							` (${nonZeroRules.length} in use)`}
-					</summary>
-					<div class="ignore-details-list">
-						{allRules.map(([id, rule]) => (
-							<div class="bar-row bar-row-compact">
-								<span class="bar-label">{formatIgnoreLabel(id)}</span>
-								<div class="bar-track">
-									<div
-										class="bar-fill"
-										class:list={{ 'bar-fill-zero': rule.pct === 0 }}
-										style={`width: ${Math.max(Math.round(rule.pct * 100), rule.pct > 0 ? 2 : 0)}%`}
-									/>
-								</div>
-								<span class="bar-pct">{formatPct(rule.pct)}</span>
-							</div>
-						))}
+	{priorityRules.map(([id, rule]) => (
+		<div class="bar-row">
+			<span class="bar-label">{formatIgnoreLabel(id)}</span>
+			<div class="bar-track">
+				<div
+					class="bar-fill"
+					class:list={{ 'bar-fill-zero': rule.pct === 0 }}
+					style={`width: ${Math.max(Math.round(rule.pct * 100), rule.pct > 0 ? 2 : 0)}%`}
+				/>
+			</div>
+			<span class="bar-pct">{formatPct(rule.pct)}</span>
+		</div>
+	))}
+
+	{extraRules.length > 0 && (
+		<details class="ignore-details">
+			<summary>
+				Show {extraRules.length} more dedicated ignore type{extraRules.length === 1 ? '' : 's'}
+				{nonZeroRules.length > 0 && ` (${nonZeroRules.length} in use overall)`}
+			</summary>
+			<div class="ignore-details-list">
+				{extraRules.map(([id, rule]) => (
+					<div class="bar-row bar-row-compact">
+						<span class="bar-label">{formatIgnoreLabel(id)}</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill"
+								class:list={{ 'bar-fill-zero': rule.pct === 0 }}
+								style={`width: ${Math.max(Math.round(rule.pct * 100), rule.pct > 0 ? 2 : 0)}%`}
+							/>
+						</div>
+						<span class="bar-pct">{formatPct(rule.pct)}</span>
 					</div>
-				</details>
-			)}
-		</>
+				))}
+			</div>
+		</details>
 	)}
 </div>
 
 <style>
-	.empty-state-inline {
-		margin: 0;
-		color: var(--text-mut);
+	.coverage-summary {
+		margin: -0.25rem 0 0.5rem;
 		font-size: 0.95rem;
+		color: var(--text-sub);
+	}
+
+	.coverage-stat strong {
+		color: var(--text);
+		font-weight: 600;
+	}
+
+	.coverage-insight {
+		margin: 0 0 1rem;
+		font-size: 0.9rem;
+		color: var(--text-mut);
+		line-height: 1.45;
 	}
 
 	.bar-row {

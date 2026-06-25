@@ -1,10 +1,27 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { formatPatternLabel } from './labels';
 
 export type SummaryEntry = CollectionEntry<'summaries'>;
+
+export const GIT_IGNORE_RULE_ID = 'git-ignore';
+
+export const PRIORITY_DEDICATED_IGNORE_IDS = [
+	'cursor-ignore',
+	'claude-ignore',
+	'ai-exclude',
+	'gemini-ignore',
+	'copilot-exclude',
+	'llm-ignore',
+] as const;
 
 export async function getAllSummaries(): Promise<SummaryEntry[]> {
 	const items = await getCollection('summaries');
 	return items.sort((a, b) => b.data.week.localeCompare(a.data.week));
+}
+
+export async function getSummariesChronological(): Promise<SummaryEntry[]> {
+	const items = await getAllSummaries();
+	return [...items].sort((a, b) => a.data.week.localeCompare(b.data.week));
 }
 
 export async function getLatestSummary(): Promise<SummaryEntry | undefined> {
@@ -29,21 +46,79 @@ export function formatPct(pct: number): string {
 	return `${Math.round(pct * 100)}%`;
 }
 
+export function isDedicatedAiIgnoreRule(ruleId: string): boolean {
+	return ruleId !== GIT_IGNORE_RULE_ID;
+}
+
+export function getGitIgnoreRule(summary: SummaryEntry) {
+	return summary.data.ignoreFilesPresent[GIT_IGNORE_RULE_ID];
+}
+
+export function getGitIgnoreCoverage(summary: SummaryEntry): number {
+	const stored = summary.data.ignoreCoverage?.gitIgnorePct;
+	if (stored !== undefined) return stored;
+
+	const rule = getGitIgnoreRule(summary);
+	return rule?.pct ?? 0;
+}
+
+export function getDedicatedAiIgnoreCoverage(summary: SummaryEntry): number {
+	const stored = summary.data.ignoreCoverage?.dedicatedAiIgnorePct;
+	if (stored !== undefined) return stored;
+
+	const dedicatedPcts = Object.entries(summary.data.ignoreFilesPresent)
+		.filter(([id]) => isDedicatedAiIgnoreRule(id))
+		.map(([, rule]) => rule.pct);
+
+	if (dedicatedPcts.length === 0) return 0;
+
+	return Math.min(
+		1,
+		dedicatedPcts.reduce((sum, pct) => sum + pct, 0),
+	);
+}
+
 export type IgnoreCoverageStats = {
-	reposWithIgnorePct: number;
-	typesInUse: number;
-	totalTypes: number;
+	gitIgnorePct: number;
+	dedicatedAiIgnorePct: number;
+	dedicatedTypesInUse: number;
+	totalDedicatedTypes: number;
 };
 
 export function computeIgnoreCoverage(summary: SummaryEntry): IgnoreCoverageStats {
-	const rules = Object.values(summary.data.ignoreFilesPresent);
-	const totalTypes = rules.length;
-	const typesInUse = rules.filter((rule) => rule.pct > 0).length;
-	const total = rules[0]?.total ?? summary.data.cohort.scanComplete;
-	const maxPresent = rules.reduce((max, rule) => Math.max(max, rule.present), 0);
-	const reposWithIgnorePct = total > 0 ? maxPresent / total : 0;
+	const dedicatedRules = Object.entries(summary.data.ignoreFilesPresent).filter(([id]) =>
+		isDedicatedAiIgnoreRule(id),
+	);
 
-	return { reposWithIgnorePct, typesInUse, totalTypes };
+	return {
+		gitIgnorePct: getGitIgnoreCoverage(summary),
+		dedicatedAiIgnorePct: getDedicatedAiIgnoreCoverage(summary),
+		dedicatedTypesInUse: dedicatedRules.filter(([, rule]) => rule.pct > 0).length,
+		totalDedicatedTypes: dedicatedRules.length,
+	};
+}
+
+export function getDedicatedIgnoreRules(summary: SummaryEntry) {
+	return Object.entries(summary.data.ignoreFilesPresent)
+		.filter(([id]) => isDedicatedAiIgnoreRule(id))
+		.sort(([, a], [, b]) => b.pct - a.pct);
+}
+
+export function getPriorityDedicatedIgnoreRules(summary: SummaryEntry) {
+	const rules = summary.data.ignoreFilesPresent;
+
+	return PRIORITY_DEDICATED_IGNORE_IDS.map((id) => [id, rules[id] ?? { present: 0, total: 0, pct: 0 }] as const);
+}
+
+export function getTopRiskSignalCategory(summary: SummaryEntry): string | undefined {
+	const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount - a.totalCount);
+	return patterns[0] ? formatPatternLabel(patterns[0].id) : undefined;
+}
+
+export function getReportLabel(summaries: SummaryEntry[], week: string): string {
+	const sorted = [...summaries].sort((a, b) => a.data.week.localeCompare(b.data.week));
+	const index = sorted.findIndex((entry) => entry.data.week === week);
+	return index >= 0 ? `Radar #${index + 1}` : week;
 }
 
 export function buildReportSummary(summary: SummaryEntry): string[] {
@@ -56,37 +131,64 @@ export function buildReportSummary(summary: SummaryEntry): string[] {
 	);
 
 	if (totals.totalExposedFiles === 0) {
-		sentences.push('No exposed file categories were detected in complete scans.');
+		sentences.push('No AI-context risk signal categories were detected in complete scans.');
 	} else {
 		const patternCount = exposedPatterns.length;
 		sentences.push(
-			`${totals.totalExposedFiles} file${totals.totalExposedFiles === 1 ? '' : 's'} matched ${patternCount} sensitive categor${patternCount === 1 ? 'y' : 'ies'} that AI tools may read.`,
+			`${totals.totalExposedFiles} AI-context risk signal${totals.totalExposedFiles === 1 ? '' : 's'} matched ${patternCount} sensitive path categor${patternCount === 1 ? 'y' : 'ies'}.`,
 		);
 	}
 
-	const { reposWithIgnorePct, typesInUse } = computeIgnoreCoverage(summary);
+	const { gitIgnorePct, dedicatedAiIgnorePct, dedicatedTypesInUse } = computeIgnoreCoverage(summary);
 
-	if (typesInUse === 0) {
-		sentences.push('No AI-oriented ignore files were detected in scanned repositories.');
-	} else if (reposWithIgnorePct >= 1) {
-		sentences.push(
-			`All scanned repos include at least one AI ignore file (${typesInUse} type${typesInUse === 1 ? '' : 's'} in use).`,
-		);
-	} else {
-		sentences.push(
-			`${formatPct(reposWithIgnorePct)} of scanned repos include an AI ignore file (${typesInUse} type${typesInUse === 1 ? '' : 's'} in use).`,
-		);
-	}
+	sentences.push(
+		`${formatPct(gitIgnorePct)} of scanned repos include a .gitignore; ${formatPct(dedicatedAiIgnorePct)} include dedicated AI ignore files${dedicatedTypesInUse > 0 ? ` (${dedicatedTypesInUse} type${dedicatedTypesInUse === 1 ? '' : 's'} in use)` : ''}.`,
+	);
 
 	return sentences;
 }
 
+export function buildMainTakeaway(summary: SummaryEntry): string[] {
+	const { gitIgnorePct, dedicatedAiIgnorePct } = computeIgnoreCoverage(summary);
+	const topPatterns = [...summary.data.exposedPatterns]
+		.sort((a, b) => b.totalCount - a.totalCount)
+		.slice(0, 4)
+		.map((pattern) => formatPatternLabel(pattern.id));
+
+	const paragraphs: string[] = [];
+
+	if (gitIgnorePct >= 0.5) {
+		paragraphs.push('Developers already have a `.gitignore` habit.');
+	} else {
+		paragraphs.push('`.gitignore` coverage is still uneven across scanned repos.');
+	}
+
+	paragraphs.push('But dedicated AI-context hygiene is still early.');
+
+	if (topPatterns.length > 0) {
+		const categoryList =
+			topPatterns.length === 1
+				? topPatterns[0]
+				: `${topPatterns.slice(0, -1).join(', ')}, and ${topPatterns[topPatterns.length - 1]}`;
+
+		if (dedicatedAiIgnorePct <= 0.1) {
+			paragraphs.push(
+				`In this sample, dedicated AI ignore files were rare, while ${categoryList} ${topPatterns.length === 1 ? 'was' : 'were'} the most common AI-context risk signals.`,
+			);
+		} else {
+			paragraphs.push(
+				`In this sample, ${formatPct(dedicatedAiIgnorePct)} of repos had dedicated AI ignore files, while ${categoryList} ${topPatterns.length === 1 ? 'was' : 'were'} the most common AI-context risk signals.`,
+			);
+		}
+	}
+
+	return paragraphs;
+}
+
 export function getNonZeroIgnoreRules(summary: SummaryEntry) {
-	return Object.entries(summary.data.ignoreFilesPresent)
-		.filter(([, rule]) => rule.pct > 0)
-		.sort(([, a], [, b]) => b.pct - a.pct);
+	return getDedicatedIgnoreRules(summary).filter(([, rule]) => rule.pct > 0);
 }
 
 export function getAllIgnoreRules(summary: SummaryEntry) {
-	return Object.entries(summary.data.ignoreFilesPresent).sort(([, a], [, b]) => b.pct - a.pct);
+	return getDedicatedIgnoreRules(summary);
 }

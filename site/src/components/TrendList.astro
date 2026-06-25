@@ -18,7 +18,7 @@ const { summaries } = Astro.props;
 				<li>
 					<a href={`/week/${entry.data.week}`} class="mono">{entry.data.week}</a>
 					<span>
-						{entry.data.totals.totalExposedFiles} files · {entry.data.cohort.scanComplete} repos
+						{entry.data.totals.totalExposedFiles} risk signals · {entry.data.cohort.scanComplete} repos
 					</span>
 				</li>
 			))}

@@ -44,6 +44,11 @@ const publicListingSchema = z.object({
 	}),
 });
 
+const ignoreCoverageSchema = z.object({
+	gitIgnorePct: z.number(),
+	dedicatedAiIgnorePct: z.number(),
+});
+
 const summarySchema = z.object({
 	schemaVersion: z.literal(1),
 	week: z.string(),
@@ -51,6 +56,7 @@ const summarySchema = z.object({
 	toolVersionRange: z.tuple([z.string(), z.string()]),
 	rulesetVersions: z.array(z.string()),
 	cohort: cohortSchema,
+	ignoreCoverage: ignoreCoverageSchema.optional(),
 	ignoreFilesPresent: z.record(z.string(), ignoreRuleSchema),
 	exposedPatterns: z.array(fleetExposedPatternSchema),
 	totals: z.object({

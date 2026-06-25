@@ -8,7 +8,7 @@ interface Props {
 
 const { summary } = Astro.props;
 const { cohort, totals, toolVersionRange, rulesetVersions } = summary.data;
-const { reposWithIgnorePct } = computeIgnoreCoverage(summary);
+const { gitIgnorePct, dedicatedAiIgnorePct } = computeIgnoreCoverage(summary);
 ---
 
 <div class="kpi-grid">
@@ -18,14 +18,19 @@ const { reposWithIgnorePct } = computeIgnoreCoverage(summary);
 		<div class="stat-label">repos in this week's stats</div>
 	</div>
 	<div class="card">
-		<h3>Exposed files</h3>
+		<h3>AI-context risk signals</h3>
 		<div class="stat-value">{totals.totalExposedFiles}</div>
-		<div class="stat-label">paths AI tools may read</div>
+		<div class="stat-label">sensitive path matches</div>
 	</div>
 	<div class="card">
-		<h3>Ignore coverage</h3>
-		<div class="stat-value">{formatPct(reposWithIgnorePct)}</div>
-		<div class="stat-label">repos with AI ignore files</div>
+		<h3>Git ignore coverage</h3>
+		<div class="stat-value">{formatPct(gitIgnorePct)}</div>
+		<div class="stat-label">repos with `.gitignore`</div>
+	</div>
+	<div class="card">
+		<h3>Dedicated AI ignore coverage</h3>
+		<div class="stat-value">{formatPct(dedicatedAiIgnorePct)}</div>
+		<div class="stat-label">repos with AI-specific ignore files</div>
 	</div>
 </div>
 
@@ -53,7 +58,7 @@ const { reposWithIgnorePct } = computeIgnoreCoverage(summary);
 			<dd>{cohort.errors}</dd>
 		</div>
 		<div>
-			<dt>Repos with exposures</dt>
+			<dt>Repos with risk signals</dt>
 			<dd>{totals.reposWithExposures}</dd>
 		</div>
 		<div>

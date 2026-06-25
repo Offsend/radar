@@ -11,10 +11,10 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 ---
 
 <div class="card">
-	<h3>Exposed file categories</h3>
-	<p class="card-scope">Aggregated pattern counts — not tied to any named repository.</p>
+	<h3>AI-context risk signal categories</h3>
+	<p class="card-scope">Aggregated path pattern counts — not tied to any named repository.</p>
 	{patterns.length === 0 ? (
-		<p class="empty-state-inline">No exposed file categories this week.</p>
+		<p class="empty-state-inline">No AI-context risk signal categories this week.</p>
 	) : (
 		<ul class="finding-list">
 			{patterns.map((pattern) => (
@@ -22,7 +22,7 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 					<span class="finding-label">{formatPatternLabel(pattern.id)}</span>
 					<span class="finding-meta">
 						{pattern.reposAffected} {pattern.reposAffected === 1 ? 'repo' : 'repos'} · {pattern.totalCount}{' '}
-						{pattern.totalCount === 1 ? 'file' : 'files'}
+						{pattern.totalCount === 1 ? 'match' : 'matches'}
 					</span>
 				</li>
 			))}
