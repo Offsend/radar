@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import Any
 from xml.sax.saxutils import escape
 
-GIT_IGNORE_RULE_ID = "git-ignore"
 WEEK_RE = re.compile(r"^(\d{4})-W(\d{2})$")
 TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "og-report.svg"
 OG_WIDTH = 1200
@@ -46,14 +45,13 @@ def format_optional_pct(value: float | None) -> str:
     return format_pct(value)
 
 
-def get_git_ignore_coverage(summary: dict[str, Any]) -> float | None:
-    stored = (summary.get("ignoreCoverage") or {}).get("gitIgnorePct")
-    if stored is not None:
-        return float(stored)
-    rule = (summary.get("ignoreFilesPresent") or {}).get(GIT_IGNORE_RULE_ID)
-    if rule and rule.get("total"):
-        return float(rule.get("pct") or 0)
-    return None
+def get_repos_with_risk_signals_pct(summary: dict[str, Any]) -> float | None:
+    cohort = summary.get("cohort") or {}
+    totals = summary.get("totals") or {}
+    scan_complete = int(cohort.get("scanComplete") or 0)
+    if scan_complete == 0:
+        return None
+    return float(totals.get("reposWithExposures") or 0) / scan_complete
 
 
 def get_dedicated_ai_ignore_coverage(summary: dict[str, Any]) -> float | None:
@@ -114,7 +112,7 @@ def build_template_values(
         "DATE_RANGE": escape(date_range or ""),
         "SCANNED": escape(str(cohort.get("scanComplete", 0))),
         "SIGNALS": escape(str(totals.get("totalExposedFiles", 0))),
-        "GIT_IGNORE": escape(format_optional_pct(get_git_ignore_coverage(summary))),
+        "REPOS_AFFECTED": escape(format_optional_pct(get_repos_with_risk_signals_pct(summary))),
         "AI_IGNORE": escape(format_optional_pct(get_dedicated_ai_ignore_coverage(summary))),
     }
 

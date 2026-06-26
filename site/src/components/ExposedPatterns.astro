@@ -55,8 +55,15 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 		justify-content: space-between;
 		align-items: baseline;
 		gap: 1rem;
-		padding: 0.65rem 0;
+		padding: 0.65rem 0.35rem;
+		margin: 0 -0.35rem;
 		border-bottom: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		transition: background 0.15s ease;
+	}
+
+	.finding-item:hover {
+		background: oklch(44% 0.14 264 / 0.04);
 	}
 
 	.finding-item:last-child {

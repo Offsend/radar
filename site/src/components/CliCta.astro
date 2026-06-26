@@ -1,11 +1,70 @@
-<section class="cli-cta card">
+<section class="cli-cta card card-cta">
 	<h2>Check your own project</h2>
 	<p>Run the same local check with Offsend CLI:</p>
-	<pre class="cli-cta-code"><code>brew install --cask offsend/tap/offsend-cli
+	<div class="code-block">
+		<pre class="cli-cta-code"><code id="cli-cta-snippet">brew install --cask offsend/tap/offsend-cli
 offsend show
 offsend prepare --dry-run</code></pre>
+		<button
+			type="button"
+			class="code-copy-btn"
+			data-copy-target="cli-cta-snippet"
+			aria-label="Copy commands to clipboard"
+		>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2" />
+				<path
+					d="M5 15V5a2 2 0 0 1 2-2h10"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"></path>
+			</svg>
+			<span class="code-copy-label">Copy</span>
+			<span class="code-copy-done" hidden>Copied</span>
+		</button>
+	</div>
 	<p class="cli-cta-note">Everything runs locally. No file contents are uploaded.</p>
+	<a class="cli-cta-link" href="https://offsend.io">Learn more about Offsend →</a>
 </section>
+
+<script>
+	function bindCopyButtons() {
+		document.querySelectorAll<HTMLButtonElement>('[data-copy-target]').forEach((button) => {
+			if (button.dataset.copyBound === 'true') return;
+			button.dataset.copyBound = 'true';
+
+			const targetId = button.dataset.copyTarget;
+			const label = button.querySelector('.code-copy-label');
+			const done = button.querySelector('.code-copy-done');
+
+			button.addEventListener('click', async () => {
+				const el = targetId ? document.getElementById(targetId) : null;
+				const text = el?.textContent?.trim() ?? '';
+				if (!text) return;
+
+				try {
+					await navigator.clipboard.writeText(text);
+				} catch {
+					window.prompt('Copy commands:', text);
+					return;
+				}
+
+				if (label && done) {
+					label.hidden = true;
+					done.hidden = false;
+					button.classList.add('is-copied');
+					window.setTimeout(() => {
+						label.hidden = false;
+						done.hidden = true;
+						button.classList.remove('is-copied');
+					}, 2000);
+				}
+			});
+		});
+	}
+
+	bindCopyButtons();
+</script>
 
 <style>
 	.cli-cta h2 {
@@ -23,10 +82,15 @@ offsend prepare --dry-run</code></pre>
 		line-height: 1.5;
 	}
 
-	.cli-cta-code {
+	.code-block {
+		position: relative;
 		margin: 0.75rem 0;
-		padding: 0.85rem 1rem;
-		background: var(--bg-2);
+	}
+
+	.cli-cta-code {
+		margin: 0;
+		padding: 0.85rem 3.25rem 0.85rem 1rem;
+		background: oklch(100% 0 0 / 0.55);
 		border: 1px solid var(--border);
 		border-radius: var(--r-sm);
 		overflow-x: auto;
@@ -40,8 +104,57 @@ offsend prepare --dry-run</code></pre>
 		white-space: pre;
 	}
 
+	.code-copy-btn {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.3rem 0.55rem;
+		font-family: var(--sans);
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--text-sub);
+		background: oklch(100% 0 0 / 0.85);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		cursor: pointer;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	.code-copy-btn:hover {
+		color: var(--text);
+		border-color: var(--border-2);
+		background: oklch(100% 0 0 / 0.95);
+	}
+
+	.code-copy-btn.is-copied {
+		color: var(--green-text);
+		border-color: var(--green-dim);
+		background: var(--green-dim);
+	}
+
 	.cli-cta-note {
 		font-size: 0.88rem;
 		color: var(--text-mut);
+	}
+
+	.cli-cta-link {
+		display: inline-block;
+		margin-top: 0.75rem;
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--blue-text);
+		cursor: pointer;
+		transition: color 0.15s ease;
+	}
+
+	.cli-cta-link:hover {
+		color: var(--brand-blue);
+		text-decoration: underline;
 	}
 </style>

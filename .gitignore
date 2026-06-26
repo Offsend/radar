@@ -5,3 +5,4 @@ venv/
 .env
 .clones/
 .DS_Store
+.cursor/

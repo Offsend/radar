@@ -69,6 +69,12 @@ export function getDedicatedAiIgnoreCoverage(summary: SummaryEntry): number | un
 	return undefined;
 }
 
+export function getReposWithRiskSignalsPct(summary: SummaryEntry): number {
+	const { cohort, totals } = summary.data;
+	if (cohort.scanComplete === 0) return 0;
+	return totals.reposWithExposures / cohort.scanComplete;
+}
+
 export type IgnoreCoverageStats = {
 	gitIgnorePct: number;
 	dedicatedAiIgnorePct: number | undefined;

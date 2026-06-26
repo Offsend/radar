@@ -70,6 +70,16 @@ const exposedFiles = listing.totals.exposedFiles ?? 0;
 		box-shadow:
 			0 1px 2px oklch(0% 0 0 / 0.04),
 			inset 0 1px 0 oklch(100% 0 0 / 0.85);
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.listing-report:hover {
+		border-color: var(--border-2);
+		box-shadow:
+			0 4px 12px oklch(0% 0 0 / 0.06),
+			inset 0 1px 0 oklch(100% 0 0 / 0.85);
 	}
 
 	.listing-header {
@@ -83,6 +93,8 @@ const exposedFiles = listing.totals.exposedFiles ?? 0;
 	.listing-repo {
 		font-weight: 600;
 		color: var(--text);
+		cursor: pointer;
+		transition: color 0.15s ease;
 	}
 
 	.listing-repo:hover {

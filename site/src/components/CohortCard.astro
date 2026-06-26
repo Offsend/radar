@@ -1,6 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { computeIgnoreCoverage, formatGeneratedAt, formatPct } from '../lib/summaries';
+import {
+	computeIgnoreCoverage,
+	formatGeneratedAt,
+	formatPct,
+	getReposWithRiskSignalsPct,
+} from '../lib/summaries';
 
 interface Props {
 	summary: CollectionEntry<'summaries'>;
@@ -8,26 +13,29 @@ interface Props {
 
 const { summary } = Astro.props;
 const { cohort, totals, toolVersionRange, rulesetVersions } = summary.data;
-const { gitIgnorePct, dedicatedAiIgnorePct } = computeIgnoreCoverage(summary);
+const { dedicatedAiIgnorePct } = computeIgnoreCoverage(summary);
+const reposWithRiskSignalsPct = getReposWithRiskSignalsPct(summary);
 ---
 
 <div class="kpi-grid">
-	<div class="card">
+	<div class="card kpi-card">
 		<h3>Scanned</h3>
 		<div class="stat-value">{cohort.scanComplete}</div>
 		<div class="stat-label">repos in this week's stats</div>
 	</div>
-	<div class="card">
+	<div class="card kpi-card">
 		<h3>AI-context risk signals</h3>
 		<div class="stat-value">{totals.totalExposedFiles}</div>
 		<div class="stat-label">sensitive path matches</div>
 	</div>
-	<div class="card">
-		<h3>Git ignore coverage</h3>
-		<div class="stat-value">{formatPct(gitIgnorePct)}</div>
-		<div class="stat-label">repos with `.gitignore`</div>
+	<div class="card kpi-card">
+		<h3>Repos with risk signals</h3>
+		<div class="stat-value">{formatPct(reposWithRiskSignalsPct)}</div>
+		<div class="stat-label">
+			{totals.reposWithExposures} of {cohort.scanComplete} repos
+		</div>
 	</div>
-	<div class="card">
+	<div class="card kpi-card">
 		<h3>Dedicated AI ignore coverage</h3>
 		<div class="stat-value">{formatPct(dedicatedAiIgnorePct)}</div>
 		<div class="stat-label">repos with AI-specific ignore files</div>

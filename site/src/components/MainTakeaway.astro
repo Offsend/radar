@@ -20,7 +20,7 @@ function renderParagraph(text: string) {
 }
 ---
 
-<div class="card main-takeaway">
+<div class="card card-featured main-takeaway">
 	<h2>Main takeaway</h2>
 	{paragraphs.map((paragraph) => (
 		<p set:html={renderParagraph(paragraph)} />
