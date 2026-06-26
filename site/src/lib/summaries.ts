@@ -42,7 +42,8 @@ export function formatGeneratedAt(iso: string): string {
 	});
 }
 
-export function formatPct(pct: number): string {
+export function formatPct(pct: number | undefined): string {
+	if (pct === undefined) return '—';
 	return `${Math.round(pct * 100)}%`;
 }
 
@@ -62,25 +63,15 @@ export function getGitIgnoreCoverage(summary: SummaryEntry): number {
 	return rule?.pct ?? 0;
 }
 
-export function getDedicatedAiIgnoreCoverage(summary: SummaryEntry): number {
+export function getDedicatedAiIgnoreCoverage(summary: SummaryEntry): number | undefined {
 	const stored = summary.data.ignoreCoverage?.dedicatedAiIgnorePct;
 	if (stored !== undefined) return stored;
-
-	const dedicatedPcts = Object.entries(summary.data.ignoreFilesPresent)
-		.filter(([id]) => isDedicatedAiIgnoreRule(id))
-		.map(([, rule]) => rule.pct);
-
-	if (dedicatedPcts.length === 0) return 0;
-
-	return Math.min(
-		1,
-		dedicatedPcts.reduce((sum, pct) => sum + pct, 0),
-	);
+	return undefined;
 }
 
 export type IgnoreCoverageStats = {
 	gitIgnorePct: number;
-	dedicatedAiIgnorePct: number;
+	dedicatedAiIgnorePct: number | undefined;
 	dedicatedTypesInUse: number;
 	totalDedicatedTypes: number;
 };
@@ -193,8 +184,13 @@ export function buildReportSummary(summary: SummaryEntry): string[] {
 
 	const { gitIgnorePct, dedicatedAiIgnorePct, dedicatedTypesInUse } = computeIgnoreCoverage(summary);
 
+	const dedicatedCoverageText =
+		dedicatedAiIgnorePct === undefined
+			? 'dedicated AI ignore coverage is unavailable for this report'
+			: `${formatPct(dedicatedAiIgnorePct)} include dedicated AI ignore files${dedicatedTypesInUse > 0 ? ` (${dedicatedTypesInUse} type${dedicatedTypesInUse === 1 ? '' : 's'} in use)` : ''}`;
+
 	sentences.push(
-		`${formatPct(gitIgnorePct)} of scanned repos include a .gitignore; ${formatPct(dedicatedAiIgnorePct)} include dedicated AI ignore files${dedicatedTypesInUse > 0 ? ` (${dedicatedTypesInUse} type${dedicatedTypesInUse === 1 ? '' : 's'} in use)` : ''}.`,
+		`${formatPct(gitIgnorePct)} of scanned repos include a .gitignore; ${dedicatedCoverageText}.`,
 	);
 
 	return sentences;
@@ -223,7 +219,11 @@ export function buildMainTakeaway(summary: SummaryEntry): string[] {
 				? topPatterns[0]
 				: `${topPatterns.slice(0, -1).join(', ')}, and ${topPatterns[topPatterns.length - 1]}`;
 
-		if (dedicatedAiIgnorePct <= 0.1) {
+		if (dedicatedAiIgnorePct === undefined) {
+			paragraphs.push(
+				`In this sample, ${categoryList} ${topPatterns.length === 1 ? 'was' : 'were'} the most common AI-context risk signals.`,
+			);
+		} else if (dedicatedAiIgnorePct <= 0.1) {
 			paragraphs.push(
 				`In this sample, dedicated AI ignore files were rare, while ${categoryList} ${topPatterns.length === 1 ? 'was' : 'were'} the most common AI-context risk signals.`,
 			);

@@ -1,0 +1,119 @@
+---
+import { buildReportPageTitle, canonicalUrl } from '../lib/seo';
+import type { SummaryEntry } from '../lib/summaries';
+
+interface Props {
+	week: string;
+	summaries: SummaryEntry[];
+}
+
+const { week, summaries } = Astro.props;
+const shareTitle = buildReportPageTitle(summaries, week);
+const shareUrl = canonicalUrl(`/week/${week}`);
+---
+
+<button
+	type="button"
+	class="share-report-btn"
+	data-share-report
+	data-share-url={shareUrl}
+	data-share-title={shareTitle}
+	aria-label="Share this report"
+>
+	<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+		<path
+			d="M12 3v10M12 3l4 4M12 3 8 7M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"></path>
+	</svg>
+	<span class="share-report-btn-text">Share</span>
+	<span class="share-report-btn-copied" hidden>Copied</span>
+</button>
+
+<script>
+	function bindShareButtons() {
+		document.querySelectorAll<HTMLButtonElement>('[data-share-report]').forEach((button) => {
+			if (button.dataset.shareBound === 'true') return;
+			button.dataset.shareBound = 'true';
+
+			const label = button.querySelector('.share-report-btn-text');
+			const copied = button.querySelector('.share-report-btn-copied');
+
+			button.addEventListener('click', async () => {
+				const url = button.dataset.shareUrl ?? '';
+				const title = button.dataset.shareTitle ?? '';
+
+				if (navigator.share) {
+					try {
+						await navigator.share({ title, url });
+						return;
+					} catch (error) {
+						if (error instanceof DOMException && error.name === 'AbortError') return;
+					}
+				}
+
+				try {
+					await navigator.clipboard.writeText(url);
+				} catch {
+					window.prompt('Copy link to this report:', url);
+					return;
+				}
+
+				if (label && copied) {
+					label.hidden = true;
+					copied.hidden = false;
+					button.classList.add('is-copied');
+					window.setTimeout(() => {
+						label.hidden = false;
+						copied.hidden = true;
+						button.classList.remove('is-copied');
+					}, 2000);
+				}
+			});
+		});
+	}
+
+	bindShareButtons();
+</script>
+
+<style>
+	.share-report-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		flex-shrink: 0;
+		padding: 0.35rem 0.7rem;
+		font-family: var(--sans);
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: var(--text-sub);
+		background: oklch(100% 0 0 / 0.72);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		box-shadow: 0 1px 2px oklch(0% 0 0 / 0.04);
+		cursor: pointer;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	.share-report-btn:hover {
+		color: var(--text);
+		border-color: var(--border-2);
+		background: oklch(100% 0 0 / 0.9);
+	}
+
+	.share-report-btn:focus-visible {
+		outline: 2px solid var(--blue);
+		outline-offset: 2px;
+	}
+
+	.share-report-btn.is-copied {
+		color: var(--green-text);
+		border-color: var(--green-dim);
+		background: var(--green-dim);
+	}
+</style>

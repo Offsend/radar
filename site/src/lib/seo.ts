@@ -1,11 +1,22 @@
 import type { SummaryEntry } from './summaries';
-import { buildReportSummary, formatReportHeading, getReportLabel } from './summaries';
+import { buildReportSummary, getReportLabel, getReportNumber } from './summaries';
 
 export const SITE_URL = 'https://radar.offsend.io';
 export const SITE_NAME = 'Offsend Radar';
 export const DEFAULT_OG_IMAGE = '/og.svg';
+
+export function ogImagePathForWeek(week: string): string {
+	const match = week.match(/^(\d{4})-W(\d{2})$/);
+	if (!match) return DEFAULT_OG_IMAGE;
+	return `/og/${match[1]}_${Number(match[2])}.png`;
+}
 export const DEFAULT_DESCRIPTION =
 	'Weekly fleet scans of AI-context hygiene in open-source repositories. Anonymous aggregates — no secrets collected.';
+
+export function buildReportPageTitle(summaries: SummaryEntry[], week: string): string {
+	const number = getReportNumber(summaries, week);
+	return number !== undefined ? `${SITE_NAME} #${number}` : SITE_NAME;
+}
 
 export function canonicalUrl(pathname: string): string {
 	const normalized = pathname.endsWith('/') ? pathname : `${pathname}/`;
@@ -36,14 +47,13 @@ export function buildReportSchema(
 	summaries: SummaryEntry[],
 	pathname: string,
 ): Record<string, unknown> {
-	const heading = formatReportHeading(summaries, summary.data.week);
 	const label = getReportLabel(summaries, summary.data.week);
 	const summaryText = buildReportSummary(summary).join(' ');
 
 	return {
 		'@context': 'https://schema.org',
 		'@type': 'Report',
-		name: heading.title,
+		name: buildReportPageTitle(summaries, summary.data.week),
 		headline: `${label}: AI-context hygiene fleet scan`,
 		description: summaryText,
 		datePublished: summary.data.generatedAt,

@@ -14,6 +14,11 @@ on:
         required: false
         type: boolean
         default: false
+      force:
+        description: "Clear existing scan records for the week and re-scan all repositories"
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: weekly-scan
@@ -36,7 +41,7 @@ jobs:
           token: ${{ secrets.RADAR_STATE_TOKEN }}
 
       - name: Install offsend CLI
-        run: brew install Offsend/tap/offsend-cli
+        run: brew install Offsend/tap/offsend-cli librsvg
 
       - name: Install Python dependencies
         run: |
@@ -57,6 +62,9 @@ jobs:
           fi
           if [ "${{ inputs.aggregate_only }}" = "true" ]; then
             args+=(--aggregate-only)
+          fi
+          if [ "${{ inputs.force }}" = "true" ]; then
+            args+=(--force)
           fi
           "${args[@]}"
 
@@ -87,7 +95,9 @@ jobs:
 
       - name: Sync summaries into site
         if: success()
-        run: python3 scripts/sync_summaries.py --state-dir state
+        run: |
+          source .venv/bin/activate
+          python scripts/sync_summaries.py --state-dir state
 
       - name: Commit site data changes
         if: success()
@@ -97,11 +107,11 @@ jobs:
           set -euo pipefail
           git config user.name "offsend-radar[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet site/src/data/summaries && git diff --cached --quiet site/src/data/summaries; then
+          if git diff --quiet site/src/data/summaries site/public/og && git diff --cached --quiet site/src/data/summaries site/public/og; then
             echo "No site data changes to commit."
             exit 0
           fi
-          git add site/src/data/summaries
+          git add site/src/data/summaries site/public/og
           week="${{ inputs.week }}"
           if [ -z "$week" ]; then
             week="$(python3 - <<'PY'

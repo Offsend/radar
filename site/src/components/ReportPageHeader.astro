@@ -1,0 +1,24 @@
+---
+import ShareReportButton from './ShareReportButton.astro';
+import { formatGeneratedAt, formatReportHeading } from '../lib/summaries';
+import type { SummaryEntry } from '../lib/summaries';
+
+interface Props {
+	summary: SummaryEntry;
+	summaries: SummaryEntry[];
+}
+
+const { summary, summaries } = Astro.props;
+const heading = formatReportHeading(summaries, summary.data.week);
+---
+
+<header class="page-header">
+	<div class="page-header-row">
+		<h1>{heading.title}</h1>
+		<ShareReportButton week={summary.data.week} summaries={summaries} />
+	</div>
+	<p>
+		{heading.tagline && <>{heading.tagline} · </>}
+		Published {formatGeneratedAt(summary.data.generatedAt)} UTC
+	</p>
+</header>

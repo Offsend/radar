@@ -6,6 +6,9 @@ on:
     paths:
       - 'site/**'
       - 'scripts/sync_summaries.py'
+      - 'scripts/generate_og_image.py'
+      - 'scripts/templates/**'
+      - 'requirements.txt'
       - '.github/workflows/deploy-site.yml'
   workflow_run:
     workflows: [Weekly scan]
@@ -35,6 +38,12 @@ jobs:
           repository: Offsend/radar-state
           path: state
           token: ${{ secrets.RADAR_STATE_TOKEN }}
+
+      - name: Install Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin
+          pip install --disable-pip-version-check -r requirements.txt
 
       - name: Sync summaries
         run: python3 scripts/sync_summaries.py --state-dir state

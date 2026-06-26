@@ -1,13 +1,14 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ReportPageHeader from '../../components/ReportPageHeader.astro';
 import ReportSections from '../../components/ReportSections.astro';
+import { getAllSummaries, getSummaryByWeek } from '../../lib/summaries';
 import {
-	getAllSummaries,
-	getSummaryByWeek,
-	formatGeneratedAt,
-	formatReportHeading,
-} from '../../lib/summaries';
-import { buildReportSchema, buildSummaryPageDescription } from '../../lib/seo';
+	buildReportPageTitle,
+	buildReportSchema,
+	buildSummaryPageDescription,
+	ogImagePathForWeek,
+} from '../../lib/seo';
 
 export async function getStaticPaths() {
 	const summaries = await getAllSummaries();
@@ -24,24 +25,18 @@ if (!summary) {
 	return Astro.redirect('/archive');
 }
 
-const heading = formatReportHeading(summaries, summary.data.week);
 const pageDescription = buildSummaryPageDescription(summary);
 const reportSchema = buildReportSchema(summary, summaries, Astro.url.pathname);
 ---
 
 <BaseLayout
-	title={heading.title}
+	title={buildReportPageTitle(summaries, summary.data.week)}
 	activeNav="archive"
 	description={pageDescription}
+	ogImage={ogImagePathForWeek(summary.data.week)}
 	jsonLd={reportSchema}
 >
-	<header class="page-header">
-		<h1>{heading.title}</h1>
-		<p>
-			{heading.tagline && <>{heading.tagline} · </>}
-			Published {formatGeneratedAt(summary.data.generatedAt)} UTC
-		</p>
-	</header>
+	<ReportPageHeader summary={summary} summaries={summaries} />
 
 	<ReportSections summary={summary} summaries={summaries} />
 </BaseLayout>

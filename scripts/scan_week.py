@@ -64,6 +64,28 @@ def append_jsonl(path: Path, row: dict[str, Any]) -> None:
         handle.write(json.dumps(row, separators=(",", ":"), ensure_ascii=False) + "\n")
 
 
+def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not rows:
+        path.unlink(missing_ok=True)
+        return
+    path.write_text(
+        "\n".join(json.dumps(row, separators=(",", ":"), ensure_ascii=False) for row in rows) + "\n",
+        encoding="utf-8",
+    )
+
+
+def clear_week_ledgers(state_dir: Path, week: str) -> int:
+    removed = 0
+    for name in ("scanned.jsonl", "skipped.jsonl", "errors.jsonl"):
+        path = state_dir / "state" / name
+        rows = load_jsonl(path)
+        kept = [row for row in rows if row.get("week") != week]
+        removed += len(rows) - len(kept)
+        write_jsonl(path, kept)
+    return removed
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -399,6 +421,17 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
     return export_summary
 
 
+def generate_week_og_image(state_dir: Path, week: str, site_root: Path, dry_run: bool) -> None:
+    from generate_og_image import generate_from_export
+
+    export_dir = state_dir / "export"
+    output_dir = site_root / "site" / "public" / "og"
+    if dry_run:
+        print(f"[dry-run] would generate OG image for {week} -> {output_dir}")
+        return
+    generate_from_export(export_dir, output_dir, week=week, dry_run=False)
+
+
 def resolve_offsend_bin(explicit: str | None) -> str:
     if explicit:
         return explicit
@@ -419,6 +452,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--offsend-bin", default=os.environ.get("OFFSEND_BIN"), help="Path to offsend binary")
     parser.add_argument("--dry-run", action="store_true", help="Print actions without cloning or writing files")
     parser.add_argument("--aggregate-only", action="store_true", help="Skip scans and rebuild weekly summary")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Clear existing scan records for the week and re-scan all target repositories",
+    )
     return parser.parse_args()
 
 
@@ -433,6 +471,17 @@ def main() -> int:
     if not state_dir.is_dir():
         print(f"error: state dir not found: {state_dir}", file=sys.stderr)
         return 2
+
+    if args.force and args.aggregate_only:
+        print("error: --force cannot be used with --aggregate-only", file=sys.stderr)
+        return 2
+
+    if args.force:
+        if args.dry_run:
+            print(f"[dry-run] would clear ledger entries for {week}")
+        else:
+            removed = clear_week_ledgers(state_dir, week)
+            print(f"force: cleared {removed} ledger entr{'y' if removed == 1 else 'ies'} for {week}")
 
     if not args.aggregate_only:
         offsend_bin = resolve_offsend_bin(args.offsend_bin)
@@ -461,6 +510,13 @@ def main() -> int:
             )
 
     aggregate_week(state_dir, week, dry_run=args.dry_run)
+
+    if not args.dry_run:
+        scripts_dir = Path(__file__).resolve().parent
+        site_root = scripts_dir.parent
+        sys.path.insert(0, str(scripts_dir))
+        generate_week_og_image(state_dir, week, site_root, dry_run=False)
+
     return 0
 
 
