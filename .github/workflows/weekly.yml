@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Checkout radar
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RADAR_STATE_TOKEN }}
 
       - name: Checkout radar-state
         uses: actions/checkout@v4
@@ -71,8 +73,6 @@ jobs:
       - name: Commit radar-state changes
         if: inputs.aggregate_only != true
         working-directory: state
-        env:
-          RADAR_STATE_TOKEN: ${{ secrets.RADAR_STATE_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name "offsend-radar[bot]"
@@ -91,7 +91,7 @@ jobs:
           fi
           git add -A
           git commit -m "scan: ${week}"
-          git push "https://x-access-token:${RADAR_STATE_TOKEN}@github.com/Offsend/radar-state.git" HEAD:main
+          git push origin HEAD:main
 
       - name: Sync summaries into site
         if: success()
@@ -101,8 +101,6 @@ jobs:
 
       - name: Commit site data changes
         if: success()
-        env:
-          RADAR_STATE_TOKEN: ${{ secrets.RADAR_STATE_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name "offsend-radar[bot]"
@@ -121,4 +119,4 @@ jobs:
           )"
           fi
           git commit -m "site: sync summaries for ${week}"
-          git push "https://x-access-token:${RADAR_STATE_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main
+          git push origin HEAD:main
