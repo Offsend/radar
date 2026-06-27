@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPatternGuides } from '../../lib/guides';
+import { buildBreadcrumbSchema } from '../../lib/seo';
+
+const guides = getPatternGuides();
+const description =
+	'Reference guides for sensitive file categories AI coding tools can read — what they are, why they matter, and how to exclude them.';
+
+const jsonLd = buildBreadcrumbSchema([
+	{ name: 'Home', pathname: '/' },
+	{ name: 'Risk patterns', pathname: '/patterns/' },
+]);
+---
+
+<BaseLayout title="AI-context risk patterns" {description} jsonLd={jsonLd}>
+	<nav class="guide-breadcrumb" aria-label="Breadcrumb">
+		<a href="/">Home</a>
+		<span aria-hidden="true">/</span>
+		Risk patterns
+	</nav>
+
+	<header class="page-header">
+		<h1>AI-context risk patterns</h1>
+		<p>
+			Sensitive file categories that AI coding tools can read at the path level. Each guide explains
+			what the category is, why it matters for AI context, and how to keep it out of assistants.
+		</p>
+	</header>
+
+	<div class="guide-hub-grid">
+		{guides.map((guide) => (
+			<a class="card guide-hub-card" href={`/patterns/${guide.slug}/`}>
+				<span class="guide-hub-card-title">{guide.title}</span>
+				<span class="guide-hub-card-file">{guide.examples[0]}</span>
+				<span class="guide-hub-card-desc">{guide.summary}</span>
+			</a>
+		))}
+	</div>
+</BaseLayout>

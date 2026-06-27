@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getIgnoreGuides } from '../../lib/guides';
+import { buildBreadcrumbSchema } from '../../lib/seo';
+
+const guides = getIgnoreGuides();
+const description =
+	'Reference guides for AI ignore files — .cursorignore, .claudeignore, AGENTS.md and more — that control what AI coding tools can read.';
+
+const jsonLd = buildBreadcrumbSchema([
+	{ name: 'Home', pathname: '/' },
+	{ name: 'AI ignore files', pathname: '/ignore-files/' },
+]);
+---
+
+<BaseLayout title="AI ignore files reference" {description} jsonLd={jsonLd}>
+	<nav class="guide-breadcrumb" aria-label="Breadcrumb">
+		<a href="/">Home</a>
+		<span aria-hidden="true">/</span>
+		AI ignore files
+	</nav>
+
+	<header class="page-header">
+		<h1>AI ignore files reference</h1>
+		<p>
+			Dedicated ignore and instruction files that control what AI coding tools can read in your
+			project. Each guide explains the file, why it matters, and how to set it up.
+		</p>
+	</header>
+
+	<div class="guide-hub-grid">
+		{guides.map((guide) => (
+			<a class="card guide-hub-card" href={`/ignore-files/${guide.slug}/`}>
+				<span class="guide-hub-card-title">{guide.filename}</span>
+				<span class="guide-hub-card-file">{guide.tool}</span>
+				<span class="guide-hub-card-desc">{guide.summary}</span>
+			</a>
+		))}
+	</div>
+</BaseLayout>

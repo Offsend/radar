@@ -1,0 +1,234 @@
+---
+import { SITE_URL } from '../lib/seo';
+
+const badgeUrl = `${SITE_URL}/badge.svg`;
+const linkUrl = `${SITE_URL}/participants/`;
+const markdownSnippet = `[![AI Context Reviewed](${badgeUrl})](${linkUrl})`;
+const htmlSnippet = `<a href="${linkUrl}"><img src="${badgeUrl}" alt="AI Context Reviewed" height="20"></a>`;
+---
+
+<section class="badge-embed card">
+	<div class="badge-embed-head">
+		<div>
+			<h2>Show your AI-context hygiene</h2>
+			<p>
+				Opted in? Add the <strong>AI Context Reviewed</strong> badge to your README. It links back to
+				Offsend Radar so visitors can see your project takes AI-context hygiene seriously.
+			</p>
+		</div>
+		<a class="badge-preview" href={linkUrl} aria-label="AI Context Reviewed badge preview">
+			<img src="/badge.svg" alt="AI Context Reviewed" width="233" height="20" />
+		</a>
+	</div>
+
+	<div class="badge-snippets">
+		<div class="badge-snippet">
+			<div class="badge-snippet-head">
+				<span class="badge-snippet-label">Markdown</span>
+				<button
+					type="button"
+					class="badge-copy-btn"
+					data-badge-copy="badge-md"
+					aria-label="Copy Markdown snippet"
+				>
+					<span class="badge-copy-label">Copy</span>
+					<span class="badge-copy-done" hidden>Copied</span>
+				</button>
+			</div>
+			<pre class="badge-code"><code id="badge-md">{markdownSnippet}</code></pre>
+		</div>
+
+		<div class="badge-snippet">
+			<div class="badge-snippet-head">
+				<span class="badge-snippet-label">HTML</span>
+				<button
+					type="button"
+					class="badge-copy-btn"
+					data-badge-copy="badge-html"
+					aria-label="Copy HTML snippet"
+				>
+					<span class="badge-copy-label">Copy</span>
+					<span class="badge-copy-done" hidden>Copied</span>
+				</button>
+			</div>
+			<pre class="badge-code"><code id="badge-html">{htmlSnippet}</code></pre>
+		</div>
+	</div>
+
+	<p class="badge-embed-note">
+		Not listed yet? <a href="https://github.com/Offsend/radar#named-public-listings-maintainer-opt-in"
+			>Opt in via the radar registry →</a
+		>
+	</p>
+</section>
+
+<script>
+	function bindBadgeCopy() {
+		document.querySelectorAll<HTMLButtonElement>('[data-badge-copy]').forEach((button) => {
+			if (button.dataset.copyBound === 'true') return;
+			button.dataset.copyBound = 'true';
+
+			const targetId = button.dataset.badgeCopy;
+			const label = button.querySelector('.badge-copy-label');
+			const done = button.querySelector('.badge-copy-done');
+
+			button.addEventListener('click', async () => {
+				const el = targetId ? document.getElementById(targetId) : null;
+				const text = el?.textContent?.trim() ?? '';
+				if (!text) return;
+
+				try {
+					await navigator.clipboard.writeText(text);
+				} catch {
+					window.prompt('Copy snippet:', text);
+					return;
+				}
+
+				if (label && done) {
+					label.hidden = true;
+					done.hidden = false;
+					button.classList.add('is-copied');
+					window.setTimeout(() => {
+						label.hidden = false;
+						done.hidden = true;
+						button.classList.remove('is-copied');
+					}, 2000);
+				}
+			});
+		});
+	}
+
+	bindBadgeCopy();
+</script>
+
+<style>
+	.badge-embed {
+		padding: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.badge-embed-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.badge-embed h2 {
+		margin: 0 0 0.5rem;
+		font-family: var(--heading);
+		font-size: 1.15rem;
+		font-weight: 700;
+		text-transform: none;
+		letter-spacing: -0.01em;
+		color: var(--text);
+	}
+
+	.badge-embed p {
+		margin: 0;
+		max-width: 52ch;
+		font-size: 0.95rem;
+		line-height: 1.5;
+		color: var(--text-sub);
+	}
+
+	.badge-preview {
+		flex-shrink: 0;
+		display: inline-flex;
+		padding: 0.5rem 0.65rem;
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		background: oklch(100% 0 0 / 0.6);
+	}
+
+	.badge-preview img {
+		display: block;
+		height: 20px;
+		width: auto;
+	}
+
+	.badge-snippets {
+		display: grid;
+		gap: 0.75rem;
+		margin-top: 1.25rem;
+	}
+
+	.badge-snippet-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 0.35rem;
+	}
+
+	.badge-snippet-label {
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--text-mut);
+	}
+
+	.badge-code {
+		margin: 0;
+		padding: 0.7rem 0.85rem;
+		background: oklch(100% 0 0 / 0.55);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		overflow-x: auto;
+	}
+
+	.badge-code code {
+		font-family: var(--mono);
+		font-size: 0.8rem;
+		line-height: 1.5;
+		color: var(--text);
+		white-space: pre;
+	}
+
+	.badge-copy-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.25rem 0.55rem;
+		font-family: var(--sans);
+		font-size: 0.72rem;
+		font-weight: 500;
+		color: var(--text-sub);
+		background: oklch(100% 0 0 / 0.85);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		cursor: pointer;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	.badge-copy-btn:hover {
+		color: var(--text);
+		border-color: var(--border-2);
+		background: oklch(100% 0 0 / 0.95);
+	}
+
+	.badge-copy-btn.is-copied {
+		color: var(--green-text);
+		border-color: var(--green-dim);
+		background: var(--green-dim);
+	}
+
+	.badge-embed-note {
+		margin: 1.25rem 0 0;
+		font-size: 0.9rem;
+		color: var(--text-mut);
+	}
+
+	.badge-embed-note a {
+		color: var(--blue-text);
+		font-weight: 500;
+	}
+
+	.badge-embed-note a:hover {
+		text-decoration: underline;
+	}
+</style>

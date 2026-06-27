@@ -6,15 +6,17 @@ import type { SummaryEntry } from '../lib/summaries';
 interface Props {
 	summary: SummaryEntry;
 	summaries: SummaryEntry[];
+	headingLevel?: 'h1' | 'h2';
 }
 
-const { summary, summaries } = Astro.props;
+const { summary, summaries, headingLevel = 'h1' } = Astro.props;
 const heading = formatReportHeading(summaries, summary.data.week);
+const Heading = headingLevel;
 ---
 
 <header class="page-header">
 	<div class="page-header-row">
-		<h1>{heading.title}</h1>
+		<Heading>{heading.title}</Heading>
 		<ShareReportButton week={summary.data.week} summaries={summaries} />
 	</div>
 	<p>

@@ -1,5 +1,18 @@
-<section class="cli-cta card card-cta">
+---
+import type { SummaryEntry } from '../lib/summaries';
+import { buildCtaHook } from '../lib/summaries';
+
+interface Props {
+	summary?: SummaryEntry;
+}
+
+const { summary } = Astro.props;
+const hook = summary ? buildCtaHook(summary) : undefined;
+---
+
+<section id="check" class="cli-cta card card-cta">
 	<h2>Check your own project</h2>
+	{hook && <p class="cli-cta-hook">{hook}</p>}
 	<p>Run the same local check with Offsend CLI:</p>
 	<div class="code-block">
 		<pre class="cli-cta-code"><code id="cli-cta-snippet">brew install --cask offsend/tap/offsend-cli
@@ -79,6 +92,14 @@ offsend prepare --dry-run</code></pre>
 		margin: 0;
 		font-size: 0.95rem;
 		color: var(--text-sub);
+		line-height: 1.5;
+	}
+
+	.cli-cta-hook {
+		margin: 0 0 0.85rem;
+		font-size: 1rem;
+		font-weight: 500;
+		color: var(--text);
 		line-height: 1.5;
 	}
 

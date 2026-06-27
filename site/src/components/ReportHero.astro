@@ -1,0 +1,120 @@
+---
+import { buildExposureHook } from '../lib/summaries';
+import type { SummaryEntry } from '../lib/summaries';
+
+interface Props {
+	summary: SummaryEntry;
+}
+
+const { summary } = Astro.props;
+const hook = buildExposureHook(summary);
+---
+
+<section class="hero" class:list={{ 'hero-clear': !hook.hasExposure }}>
+	<p class="hero-eyebrow">Weekly AI-context hygiene research</p>
+	<h1 class="hero-headline">{hook.headline}</h1>
+	<p class="hero-lead">{hook.lead}</p>
+	<div class="hero-actions">
+		<a class="hero-btn hero-btn-primary" href="#check">Check your project</a>
+		<a class="hero-btn hero-btn-ghost" href="/methodology">How it works</a>
+	</div>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		margin-bottom: 2rem;
+		padding: 2.25rem 2rem 2rem;
+		border-radius: var(--r-lg);
+		background: var(--brand-gradient-soft);
+		border: 1px solid oklch(44% 0.14 264 / 0.16);
+		border-left: 3px solid var(--red);
+		box-shadow:
+			0 2px 12px oklch(0% 0 0 / 0.05),
+			inset 0 1px 0 oklch(100% 0 0 / 0.85);
+		overflow: hidden;
+	}
+
+	.hero-clear {
+		border-left-color: var(--green);
+	}
+
+	.hero-eyebrow {
+		margin: 0 0 0.6rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--brand-blue);
+	}
+
+	.hero-headline {
+		margin: 0;
+		max-width: 22ch;
+		font-family: var(--heading);
+		font-size: clamp(2rem, 5vw, 3rem);
+		font-weight: 700;
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+		color: var(--text);
+	}
+
+	.hero-lead {
+		margin: 1rem 0 0;
+		max-width: 60ch;
+		font-size: clamp(1rem, 1.4vw, 1.15rem);
+		line-height: 1.55;
+		color: var(--text-sub);
+	}
+
+	.hero-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 1.5rem;
+	}
+
+	.hero-btn {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.6rem 1.15rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		border-radius: var(--r-sm);
+		cursor: pointer;
+		transition:
+			background 0.15s ease,
+			border-color 0.15s ease,
+			color 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.hero-btn-primary {
+		color: #fff;
+		background: var(--brand-blue);
+		border: 1px solid var(--brand-blue);
+	}
+
+	.hero-btn-primary:hover {
+		background: #2448a8;
+		transform: translateY(-1px);
+	}
+
+	.hero-btn-ghost {
+		color: var(--text);
+		background: oklch(100% 0 0 / 0.7);
+		border: 1px solid var(--border-2);
+	}
+
+	.hero-btn-ghost:hover {
+		background: oklch(100% 0 0 / 0.95);
+		border-color: var(--brand-blue);
+		color: var(--blue-text);
+	}
+
+	@media (max-width: 768px) {
+		.hero {
+			padding: 1.75rem 1.35rem 1.5rem;
+		}
+	}
+</style>

@@ -7,8 +7,29 @@ const PATTERN_LABELS: Record<string, string> = {
 	'kube-config': 'Kubernetes config',
 	'docker-config': 'Docker config',
 	'npmrc': 'npm credentials (.npmrc)',
+	'npmrc-files': 'npm credentials (.npmrc)',
 	'netrc': 'netrc credentials',
 	'pypirc': 'PyPI credentials (.pypirc)',
+};
+
+const PATTERN_SHORT_LABELS: Record<string, string> = {
+	'env-files': '.env files',
+	'pem-files': 'certificates',
+	'key-files': 'private keys',
+	'ssh-keys': 'SSH keys',
+	'aws-credentials': 'AWS credentials',
+	'gcp-credentials': 'GCP credentials',
+	'kube-config': 'kubeconfig',
+	'docker-config': 'Docker config',
+	'npmrc': '.npmrc credentials',
+	'npmrc-files': '.npmrc credentials',
+	'netrc': '.netrc credentials',
+	'pypirc': '.pypirc credentials',
+	'android-keystore': 'Android keystores',
+	'pkcs12-p12': 'PKCS#12 keystores',
+	'terraform-vars': 'Terraform vars',
+	'db-dumps': 'database dumps',
+	'local-databases': 'local databases',
 };
 
 const IGNORE_LABELS: Record<string, string> = {
@@ -41,6 +62,10 @@ function humanizeId(id: string): string {
 
 export function formatPatternLabel(id: string): string {
 	return PATTERN_LABELS[id] ?? humanizeId(id);
+}
+
+export function formatPatternShort(id: string): string {
+	return PATTERN_SHORT_LABELS[id] ?? formatPatternLabel(id);
 }
 
 export function formatIgnoreLabel(id: string): string {

@@ -682,11 +682,13 @@ footer .links a:hover {
 	margin-bottom: 0.35rem;
 }
 
-.page-header-row h1 {
+.page-header-row h1,
+.page-header-row h2 {
 	margin: 0;
 }
 
-.page-header h1 {
+.page-header h1,
+.page-header h2 {
 	margin: 0 0 0.35rem;
 	font-size: clamp(1.75rem, 4vw, 2.35rem);
 	font-weight: 700;
@@ -949,6 +951,222 @@ td a.mono:hover {
 	padding: 2rem;
 	text-align: center;
 	color: var(--text-mut);
+}
+
+/* ─── guides (programmatic SEO pages) ──────────────────────────────────── */
+.guide-breadcrumb {
+	margin-bottom: 1rem;
+	font-size: 0.8rem;
+	color: var(--text-mut);
+}
+
+.guide-breadcrumb a {
+	color: var(--blue-text);
+	font-weight: 500;
+}
+
+.guide-breadcrumb a:hover {
+	text-decoration: underline;
+}
+
+.guide-breadcrumb span[aria-hidden] {
+	margin: 0 0.4rem;
+	color: var(--text-dim);
+}
+
+.guide-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-bottom: 0.85rem;
+}
+
+.guide-chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.15rem 0.55rem;
+	font-family: var(--mono);
+	font-size: 0.78rem;
+	color: var(--text-sub);
+	background: var(--bg-2);
+	border: 1px solid var(--border);
+	border-radius: 999px;
+}
+
+.guide-lead {
+	margin: 0;
+	max-width: 65ch;
+	font-size: 1.1rem;
+	line-height: 1.55;
+	color: var(--text-sub);
+}
+
+.guide-body {
+	display: grid;
+	gap: 1rem;
+	margin-top: 1.5rem;
+}
+
+.guide-body h2 {
+	margin: 0 0 0.75rem;
+	font-family: var(--heading);
+	font-size: 1.15rem;
+	font-weight: 700;
+	text-transform: none;
+	letter-spacing: -0.01em;
+	color: var(--text);
+}
+
+.guide-body p,
+.guide-body li {
+	margin: 0;
+	font-size: 0.97rem;
+	color: var(--text-sub);
+	line-height: 1.6;
+}
+
+.guide-body p + p,
+.guide-body ul,
+.guide-body ol {
+	margin-top: 0.75rem;
+}
+
+.guide-body ul,
+.guide-body ol {
+	padding-left: 1.15rem;
+}
+
+.guide-body li + li {
+	margin-top: 0.4rem;
+}
+
+.guide-body :not(pre) > code {
+	font-family: var(--mono);
+	font-size: 0.88em;
+	background: var(--bg-2);
+	padding: 0.1em 0.35em;
+	border-radius: 4px;
+}
+
+.guide-live {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 0.5rem 0.85rem;
+	padding: 0.85rem 1.1rem;
+	background: var(--brand-gradient-soft);
+	border: 1px solid oklch(44% 0.14 264 / 0.16);
+	border-radius: var(--r-sm);
+	font-size: 0.95rem;
+	color: var(--text-sub);
+}
+
+.guide-live strong {
+	color: var(--text);
+	font-weight: 600;
+}
+
+.guide-live a {
+	color: var(--blue-text);
+	font-weight: 500;
+}
+
+.guide-live a:hover {
+	text-decoration: underline;
+}
+
+.guide-faq dt {
+	font-weight: 600;
+	color: var(--text);
+	font-size: 0.97rem;
+}
+
+.guide-faq dd {
+	margin: 0.35rem 0 0;
+	font-size: 0.95rem;
+	color: var(--text-sub);
+	line-height: 1.6;
+}
+
+.guide-faq dd + dt {
+	margin-top: 1rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--border);
+}
+
+.guide-related {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.guide-related a {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.35rem 0.7rem;
+	font-family: var(--mono);
+	font-size: 0.82rem;
+	color: var(--blue-text);
+	background: oklch(100% 0 0 / 0.6);
+	border: 1px solid var(--border);
+	border-radius: var(--r-sm);
+	transition:
+		border-color 0.15s ease,
+		background 0.15s ease;
+}
+
+.guide-related a:hover {
+	border-color: var(--brand-blue);
+	background: oklch(100% 0 0 / 0.9);
+}
+
+.guide-hub-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 1rem;
+}
+
+.guide-hub-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	padding: 1.1rem 1.25rem;
+	height: 100%;
+	transition:
+		border-color 0.2s ease,
+		box-shadow 0.2s ease,
+		transform 0.2s ease;
+}
+
+a.guide-hub-card:hover {
+	border-color: var(--border-2);
+	box-shadow:
+		0 4px 12px oklch(0% 0 0 / 0.06),
+		inset 0 1px 0 oklch(100% 0 0 / 0.85);
+	transform: translateY(-1px);
+}
+
+.guide-hub-card-title {
+	font-family: var(--heading);
+	font-size: 1.05rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	color: var(--text);
+}
+
+.guide-hub-card-file {
+	font-family: var(--mono);
+	font-size: 0.8rem;
+	color: var(--text-mut);
+}
+
+.guide-hub-card-desc {
+	font-size: 0.9rem;
+	color: var(--text-sub);
+	line-height: 1.5;
 }
 
 @media (max-width: 768px) {

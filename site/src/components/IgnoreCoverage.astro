@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { formatIgnoreLabel } from '../lib/labels';
+import { ignoreGuideSlugById } from '../lib/guides';
 import {
 	formatPct,
 	getAllIgnoreRules,
@@ -30,12 +31,18 @@ const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) 
 		</span>
 	</p>
 	<p class="coverage-insight">
-		Developers already have a `.gitignore` habit. Dedicated AI ignore files are still rare.
+		Dedicated AI ignore files are still rare.
 	</p>
 
 	{priorityRules.map(([id, rule]) => (
 		<div class="bar-row">
-			<span class="bar-label">{formatIgnoreLabel(id)}</span>
+			{ignoreGuideSlugById(id) ? (
+				<a class="bar-label bar-label-link" href={`/ignore-files/${ignoreGuideSlugById(id)}/`}>
+					{formatIgnoreLabel(id)}
+				</a>
+			) : (
+				<span class="bar-label">{formatIgnoreLabel(id)}</span>
+			)}
 			<div class="bar-track">
 				<div
 					class="bar-fill"
@@ -56,7 +63,13 @@ const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) 
 			<div class="ignore-details-list">
 				{extraRules.map(([id, rule]) => (
 					<div class="bar-row bar-row-compact">
-						<span class="bar-label">{formatIgnoreLabel(id)}</span>
+						{ignoreGuideSlugById(id) ? (
+							<a class="bar-label bar-label-link" href={`/ignore-files/${ignoreGuideSlugById(id)}/`}>
+								{formatIgnoreLabel(id)}
+							</a>
+						) : (
+							<span class="bar-label">{formatIgnoreLabel(id)}</span>
+						)}
 						<div class="bar-track">
 							<div
 								class="bar-fill"
@@ -93,6 +106,16 @@ const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) 
 
 	.bar-row {
 		grid-template-columns: minmax(140px, 1fr) 1fr 52px;
+	}
+
+	.bar-label-link {
+		color: var(--text-sub);
+		transition: color 0.15s ease;
+	}
+
+	.bar-label-link:hover {
+		color: var(--blue-text);
+		text-decoration: underline;
 	}
 
 	.ignore-details {

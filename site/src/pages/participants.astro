@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BadgeEmbed from '../components/BadgeEmbed.astro';
 import ListingReport from '../components/ListingReport.astro';
 import { getAllTimeParticipants } from '../lib/participants';
 import { getAllSummaries, getReportLabel } from '../lib/summaries';
@@ -21,6 +22,8 @@ const chronological = [...summaries].sort((a, b) => a.data.week.localeCompare(b.
 			shows the latest published scan; week links open that week's full fleet report.
 		</p>
 	</header>
+
+	<BadgeEmbed />
 
 	{participants.length === 0 ? (
 		<div class="card empty-state">

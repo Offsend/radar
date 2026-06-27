@@ -1,0 +1,143 @@
+---
+interface Props {
+	code: string;
+	label?: string;
+}
+
+const { code, label } = Astro.props;
+const uid = `cb-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<div class="copyblock">
+	{label && <span class="copyblock-label">{label}</span>}
+	<div class="copyblock-body">
+		<pre class="copyblock-pre"><code id={uid}>{code}</code></pre>
+		<button
+			type="button"
+			class="copyblock-btn"
+			data-copy-target={uid}
+			aria-label="Copy to clipboard"
+		>
+			<svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2" />
+				<path
+					d="M5 15V5a2 2 0 0 1 2-2h10"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"></path>
+			</svg>
+			<span class="copyblock-copy">Copy</span>
+			<span class="copyblock-done" hidden>Copied</span>
+		</button>
+	</div>
+</div>
+
+<script>
+	function bindCopyTargets() {
+		document.querySelectorAll<HTMLButtonElement>('[data-copy-target]').forEach((button) => {
+			if (button.dataset.copyBound === 'true') return;
+			button.dataset.copyBound = 'true';
+
+			const targetId = button.dataset.copyTarget;
+			const copy = button.querySelector('.copyblock-copy');
+			const done = button.querySelector('.copyblock-done');
+
+			button.addEventListener('click', async () => {
+				const el = targetId ? document.getElementById(targetId) : null;
+				const text = el?.textContent ?? '';
+				if (!text) return;
+
+				try {
+					await navigator.clipboard.writeText(text);
+				} catch {
+					window.prompt('Copy:', text);
+					return;
+				}
+
+				if (copy && done) {
+					copy.hidden = true;
+					done.hidden = false;
+					button.classList.add('is-copied');
+					window.setTimeout(() => {
+						copy.hidden = false;
+						done.hidden = true;
+						button.classList.remove('is-copied');
+					}, 2000);
+				}
+			});
+		});
+	}
+
+	bindCopyTargets();
+</script>
+
+<style>
+	.copyblock {
+		margin: 0.75rem 0 0;
+	}
+
+	.copyblock-label {
+		display: block;
+		margin-bottom: 0.35rem;
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--text-mut);
+	}
+
+	.copyblock-body {
+		position: relative;
+	}
+
+	.copyblock-pre {
+		margin: 0;
+		padding: 0.85rem 3.25rem 0.85rem 1rem;
+		background: var(--bg-2);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		overflow-x: auto;
+	}
+
+	.copyblock-pre code {
+		font-family: var(--mono);
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--text);
+		white-space: pre;
+	}
+
+	.copyblock-btn {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.3rem 0.55rem;
+		font-family: var(--sans);
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--text-sub);
+		background: oklch(100% 0 0 / 0.85);
+		border: 1px solid var(--border);
+		border-radius: var(--r-sm);
+		cursor: pointer;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+
+	.copyblock-btn:hover {
+		color: var(--text);
+		border-color: var(--border-2);
+		background: oklch(100% 0 0 / 0.95);
+	}
+
+	.copyblock-btn.is-copied {
+		color: var(--green-text);
+		border-color: var(--green-dim);
+		background: var(--green-dim);
+	}
+</style>

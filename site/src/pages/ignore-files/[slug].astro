@@ -1,0 +1,123 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CliCta from '../../components/CliCta.astro';
+import CopyBlock from '../../components/CopyBlock.astro';
+import { getIgnoreGuides } from '../../lib/guides';
+import { getLatestSummary, getAllSummaries, getReportLabel, formatPct } from '../../lib/summaries';
+import { buildArticleSchema, buildBreadcrumbSchema, buildFaqSchema } from '../../lib/seo';
+
+export function getStaticPaths() {
+	return getIgnoreGuides().map((guide) => ({
+		params: { slug: guide.slug },
+		props: { guide },
+	}));
+}
+
+const { guide } = Astro.props;
+const pathname = `/ignore-files/${guide.slug}`;
+
+const latest = await getLatestSummary();
+const summaries = await getAllSummaries();
+const liveRule = latest?.data.ignoreFilesPresent[guide.id];
+const liveLabel = latest ? getReportLabel(summaries, latest.data.week) : undefined;
+
+const jsonLd: Record<string, unknown>[] = [
+	buildArticleSchema({ title: guide.metaTitle, description: guide.summary, pathname }),
+	buildBreadcrumbSchema([
+		{ name: 'Home', pathname: '/' },
+		{ name: 'AI ignore files', pathname: '/ignore-files/' },
+		{ name: guide.filename, pathname },
+	]),
+];
+const faqSchema = buildFaqSchema(guide.faq);
+if (faqSchema) jsonLd.push(faqSchema);
+---
+
+<BaseLayout title={guide.metaTitle} description={guide.summary} jsonLd={jsonLd}>
+	<nav class="guide-breadcrumb" aria-label="Breadcrumb">
+		<a href="/">Home</a>
+		<span aria-hidden="true">/</span>
+		<a href="/ignore-files/">AI ignore files</a>
+		<span aria-hidden="true">/</span>
+		{guide.filename}
+	</nav>
+
+	<header class="page-header">
+		<div class="guide-meta">
+			<span class="guide-chip">{guide.filename}</span>
+			<span class="guide-chip">{guide.tool}</span>
+		</div>
+		<h1>{guide.filename}</h1>
+		<p class="guide-lead">{guide.summary}</p>
+	</header>
+
+	{liveRule && latest && (
+		<p class="guide-live">
+			<span>
+				<strong>This week:</strong> {formatPct(liveRule.pct)} of {liveRule.total} scanned repos had{' '}
+				{guide.filename}.
+			</span>
+			<a href={`/week/${latest.data.week}/`}>See {liveLabel} →</a>
+		</p>
+	)}
+
+	<div class="guide-body">
+		<section class="card">
+			<h2>What it is</h2>
+			<p>{guide.whatItIs}</p>
+		</section>
+
+		<section class="card">
+			<h2>Why use it</h2>
+			<p>{guide.whyUseIt}</p>
+		</section>
+
+		<section class="card">
+			<h2>How to set it up</h2>
+			<p>{guide.howToCreate}</p>
+			<CopyBlock code={guide.example} label={`Example ${guide.filename}`} />
+			{guide.docsUrl && (
+				<p>
+					<a class="guide-docs-link" href={guide.docsUrl} target="_blank" rel="noopener noreferrer">
+						Official {guide.tool} docs →
+					</a>
+				</p>
+			)}
+		</section>
+
+		<section class="card">
+			<h2>What to exclude</h2>
+			<p>Common sensitive categories worth adding to {guide.filename}:</p>
+			<ul class="guide-related">
+				<li><a href="/patterns/env-files/">.env files</a></li>
+				<li><a href="/patterns/key-files/">private keys</a></li>
+				<li><a href="/patterns/pem-files/">.pem certificates</a></li>
+			</ul>
+		</section>
+
+		<section class="card">
+			<h2>FAQ</h2>
+			<dl class="guide-faq">
+				{guide.faq.map((item) => (
+					<>
+						<dt>{item.q}</dt>
+						<dd>{item.a}</dd>
+					</>
+				))}
+			</dl>
+		</section>
+
+		<CliCta summary={latest} />
+	</div>
+</BaseLayout>
+
+<style>
+	.guide-docs-link {
+		color: var(--blue-text);
+		font-weight: 500;
+	}
+
+	.guide-docs-link:hover {
+		text-decoration: underline;
+	}
+</style>

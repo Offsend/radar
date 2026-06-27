@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { formatPatternLabel } from '../lib/labels';
+import { patternGuideSlugById } from '../lib/guides';
 
 interface Props {
 	summary: CollectionEntry<'summaries'>;
@@ -17,15 +18,24 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 		<p class="empty-state-inline">No AI-context risk signal categories this week.</p>
 	) : (
 		<ul class="finding-list">
-			{patterns.map((pattern) => (
-				<li class="finding-item">
-					<span class="finding-label">{formatPatternLabel(pattern.id)}</span>
-					<span class="finding-meta">
-						{pattern.reposAffected} {pattern.reposAffected === 1 ? 'repo' : 'repos'} · {pattern.totalCount}{' '}
-						{pattern.totalCount === 1 ? 'match' : 'matches'}
-					</span>
-				</li>
-			))}
+			{patterns.map((pattern) => {
+				const slug = patternGuideSlugById(pattern.id);
+				return (
+					<li class="finding-item">
+						{slug ? (
+							<a class="finding-label finding-link" href={`/patterns/${slug}/`}>
+								{formatPatternLabel(pattern.id)}
+							</a>
+						) : (
+							<span class="finding-label">{formatPatternLabel(pattern.id)}</span>
+						)}
+						<span class="finding-meta">
+							{pattern.reposAffected} {pattern.reposAffected === 1 ? 'repo' : 'repos'} · {pattern.totalCount}{' '}
+							{pattern.totalCount === 1 ? 'match' : 'matches'}
+						</span>
+					</li>
+				);
+			})}
 		</ul>
 	)}
 </div>
@@ -75,6 +85,16 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 		font-size: 0.95rem;
 		font-weight: 500;
 		color: var(--text);
+	}
+
+	.finding-link {
+		color: var(--text);
+		transition: color 0.15s ease;
+	}
+
+	.finding-link:hover {
+		color: var(--blue-text);
+		text-decoration: underline;
 	}
 
 	.finding-meta {

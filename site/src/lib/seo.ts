@@ -79,3 +79,65 @@ export function buildReportSchema(
 export function buildSummaryPageDescription(summary: SummaryEntry): string {
 	return buildReportSummary(summary).join(' ').slice(0, 160);
 }
+
+export function buildArticleSchema(opts: {
+	title: string;
+	description: string;
+	pathname: string;
+}): Record<string, unknown> {
+	return {
+		'@context': 'https://schema.org',
+		'@type': 'TechArticle',
+		headline: opts.title,
+		description: opts.description,
+		url: canonicalUrl(opts.pathname),
+		author: {
+			'@type': 'Organization',
+			name: 'Offsend',
+			url: 'https://offsend.io',
+		},
+		publisher: {
+			'@type': 'Organization',
+			name: 'Offsend',
+			url: 'https://offsend.io',
+		},
+		isPartOf: {
+			'@type': 'WebSite',
+			name: SITE_NAME,
+			url: SITE_URL,
+		},
+	};
+}
+
+export function buildFaqSchema(
+	faq: { q: string; a: string }[],
+): Record<string, unknown> | undefined {
+	if (faq.length === 0) return undefined;
+	return {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: faq.map((item) => ({
+			'@type': 'Question',
+			name: item.q,
+			acceptedAnswer: {
+				'@type': 'Answer',
+				text: item.a,
+			},
+		})),
+	};
+}
+
+export function buildBreadcrumbSchema(
+	items: { name: string; pathname: string }[],
+): Record<string, unknown> {
+	return {
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: items.map((item, index) => ({
+			'@type': 'ListItem',
+			position: index + 1,
+			name: item.name,
+			item: canonicalUrl(item.pathname),
+		})),
+	};
+}

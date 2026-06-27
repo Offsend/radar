@@ -15,11 +15,11 @@
 <text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="60" font-weight="bold" letter-spacing="0em"><tspan x="547" y="506.301">{AI_IGNORE}</tspan></text>
 <text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="60" font-weight="bold" letter-spacing="0em"><tspan x="36" y="506.301">{REPOS_AFFECTED}</tspan></text>
 <text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="-0.04em"><tspan x="36" y="296.014">Scanned repos</tspan></text>
-<text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="-0.04em"><tspan x="547" y="441.014">Dedicated Al ignore</tspan></text>
+<text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="-0.04em"><tspan x="547" y="441.014">Dedicated AI ignore</tspan></text>
 <text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="0em"><tspan x="36" y="441.014">Repos with risk signals</tspan></text>
 <text fill="white" fill-opacity="0.5" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="-0.03em"><tspan x="80" y="599.014">github.com/Offsend/radar</tspan></text>
 <text fill="white" fill-opacity="0.5" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="-0.03em"><tspan x="1058.62" y="599.014">offsend.io</tspan></text>
-<text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="-0.04em"><tspan x="547" y="296.014">Al-context risk signals</tspan></text>
+<text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="26" letter-spacing="-0.04em"><tspan x="547" y="296.014">AI-context risk signals</tspan></text>
 <text fill="white" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="46" font-weight="bold" letter-spacing="-0.03em"><tspan x="36" y="78.4473">{REPORT_LABEL}</tspan></text>
 <text fill="white" fill-opacity="0.6" style="white-space: pre" xml:space="preserve" font-family="Arial" font-size="21" font-weight="bold" letter-spacing="0em"><tspan x="36" y="119.28">{DATE_RANGE}</tspan></text>
 <defs>

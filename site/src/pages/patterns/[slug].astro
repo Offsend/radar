@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CliCta from '../../components/CliCta.astro';
+import CopyBlock from '../../components/CopyBlock.astro';
+import { getPatternGuides, getIgnoreGuidesBySlugs } from '../../lib/guides';
+import { getLatestSummary, getReportLabel, getAllSummaries } from '../../lib/summaries';
+import { buildArticleSchema, buildBreadcrumbSchema, buildFaqSchema } from '../../lib/seo';
+
+export function getStaticPaths() {
+	return getPatternGuides().map((guide) => ({
+		params: { slug: guide.slug },
+		props: { guide },
+	}));
+}
+
+const { guide } = Astro.props;
+const pathname = `/patterns/${guide.slug}`;
+
+const latest = await getLatestSummary();
+const summaries = await getAllSummaries();
+const liveStat = latest?.data.exposedPatterns.find((pattern) => pattern.id === guide.id);
+const liveLabel = latest ? getReportLabel(summaries, latest.data.week) : undefined;
+
+const relatedIgnore = getIgnoreGuidesBySlugs(guide.relatedIgnore);
+
+const severityClass =
+	guide.severity === 'required'
+		? 'badge-required'
+		: guide.severity === 'recommended'
+			? 'badge-secret'
+			: 'badge';
+
+const jsonLd: Record<string, unknown>[] = [
+	buildArticleSchema({ title: guide.metaTitle, description: guide.summary, pathname }),
+	buildBreadcrumbSchema([
+		{ name: 'Home', pathname: '/' },
+		{ name: 'Risk patterns', pathname: '/patterns/' },
+		{ name: guide.title, pathname },
+	]),
+];
+const faqSchema = buildFaqSchema(guide.faq);
+if (faqSchema) jsonLd.push(faqSchema);
+---
+
+<BaseLayout title={guide.metaTitle} description={guide.summary} jsonLd={jsonLd}>
+	<nav class="guide-breadcrumb" aria-label="Breadcrumb">
+		<a href="/">Home</a>
+		<span aria-hidden="true">/</span>
+		<a href="/patterns/">Risk patterns</a>
+		<span aria-hidden="true">/</span>
+		{guide.title}
+	</nav>
+
+	<header class="page-header">
+		<div class="guide-meta">
+			<span class={`badge ${severityClass}`}>{guide.severity}</span>
+			{guide.examples.map((ex) => <span class="guide-chip">{ex}</span>)}
+		</div>
+		<h1>{guide.title}</h1>
+		<p class="guide-lead">{guide.summary}</p>
+	</header>
+
+	{liveStat && latest && (
+		<p class="guide-live">
+			<span>
+				<strong>This week:</strong> {liveStat.reposAffected}{' '}
+				{liveStat.reposAffected === 1 ? 'repo' : 'repos'} in the scanned fleet exposed this category
+				({liveStat.totalCount} {liveStat.totalCount === 1 ? 'match' : 'matches'}).
+			</span>
+			<a href={`/week/${latest.data.week}/`}>See {liveLabel} →</a>
+		</p>
+	)}
+
+	<div class="guide-body">
+		<section class="card">
+			<h2>What it is</h2>
+			<p>{guide.whatItIs}</p>
+		</section>
+
+		<section class="card">
+			<h2>Why it matters for AI context</h2>
+			<p>{guide.whyAiContext}</p>
+		</section>
+
+		<section class="card">
+			<h2>How to keep it out of AI tools</h2>
+			<ol>
+				{guide.howToFix.map((step) => <li>{step}</li>)}
+			</ol>
+			<CopyBlock code={guide.ignoreSnippet} label="Add to your ignore file" />
+		</section>
+
+		{relatedIgnore.length > 0 && (
+			<section class="card">
+				<h2>Ignore files that exclude this</h2>
+				<ul class="guide-related">
+					{relatedIgnore.map((ig) => (
+						<li>
+							<a href={`/ignore-files/${ig.slug}/`}>{ig.filename}</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		)}
+
+		<section class="card">
+			<h2>FAQ</h2>
+			<dl class="guide-faq">
+				{guide.faq.map((item) => (
+					<>
+						<dt>{item.q}</dt>
+						<dd>{item.a}</dd>
+					</>
+				))}
+			</dl>
+		</section>
+
+		<CliCta summary={latest} />
+	</div>
+</BaseLayout>

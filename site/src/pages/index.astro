@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ReportHero from '../components/ReportHero.astro';
 import ReportPageHeader from '../components/ReportPageHeader.astro';
 import ReportSections from '../components/ReportSections.astro';
 import { getAllSummaries, getLatestSummary } from '../lib/summaries';
@@ -18,7 +19,9 @@ const pageDescription = latest ? buildSummaryPageDescription(latest) : undefined
 >
 	{latest ? (
 		<>
-			<ReportPageHeader summary={latest} summaries={summaries} />
+			<ReportHero summary={latest} />
+
+			<ReportPageHeader summary={latest} summaries={summaries} headingLevel="h2" />
 
 			<ReportSections summary={latest} summaries={summaries} showTrend />
 		</>

@@ -53,7 +53,7 @@ const { summary, summaries = [], showTrend = false } = Astro.props;
 		<PublicListings summary={summary} summaries={summaries} />
 	</SectionGroup>
 
-	<CliCta />
+	<CliCta summary={summary} />
 </div>
 
 <style>
