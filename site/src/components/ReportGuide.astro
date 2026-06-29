@@ -6,10 +6,19 @@
 			Radar uses path-level checks to detect files and folders that may become visible to AI coding
 			tools if they are not covered by AI-specific ignore rules.
 		</p>
+		<p>
+			A <strong>risk signal</strong> is a file committed to the repository whose path matches a
+			sensitive category (for example <code>.env</code> or <code>*.pem</code>). Counts are file
+			matches at the path level — Radar never opens the files.
+		</p>
 		<ul class="report-guide-points">
 			<li>No file contents were read.</li>
 			<li>No secrets were collected.</li>
 			<li>No repository names are published without opt-in.</li>
+			<li>
+				Repositories are a manually curated cohort, not a random sample — read these as directional
+				signals, not population-level statistics.
+			</li>
 		</ul>
 	</div>
 </details>
@@ -59,6 +68,14 @@
 		font-size: 0.95rem;
 		color: var(--text-sub);
 		line-height: 1.5;
+	}
+
+	.report-guide :global(code) {
+		font-family: var(--mono);
+		font-size: 0.88em;
+		background: var(--bg-2);
+		padding: 0.1em 0.35em;
+		border-radius: 4px;
 	}
 
 	.report-guide-points {

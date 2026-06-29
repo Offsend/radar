@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { formatPatternLabel } from '../lib/labels';
+import { formatPatternLabel, formatSeverityLabel, severityRank } from '../lib/labels';
 import { patternGuideSlugById } from '../lib/guides';
 
 interface Props {
@@ -8,7 +8,9 @@ interface Props {
 }
 
 const { summary } = Astro.props;
-const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount - a.totalCount);
+const patterns = [...summary.data.exposedPatterns].sort(
+	(a, b) => severityRank(a.severity) - severityRank(b.severity) || b.totalCount - a.totalCount,
+);
 ---
 
 <div class="card">
@@ -22,13 +24,16 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 				const slug = patternGuideSlugById(pattern.id);
 				return (
 					<li class="finding-item">
-						{slug ? (
-							<a class="finding-label finding-link" href={`/patterns/${slug}/`}>
-								{formatPatternLabel(pattern.id)}
-							</a>
-						) : (
-							<span class="finding-label">{formatPatternLabel(pattern.id)}</span>
-						)}
+						<span class="finding-name">
+							{slug ? (
+								<a class="finding-label finding-link" href={`/patterns/${slug}/`}>
+									{formatPatternLabel(pattern.id)}
+								</a>
+							) : (
+								<span class="finding-label">{formatPatternLabel(pattern.id)}</span>
+							)}
+							<span class={`sev sev-${pattern.severity}`}>{formatSeverityLabel(pattern.severity)}</span>
+						</span>
 						<span class="finding-meta">
 							{pattern.reposAffected} {pattern.reposAffected === 1 ? 'repo' : 'repos'} · {pattern.totalCount}{' '}
 							{pattern.totalCount === 1 ? 'match' : 'matches'}
@@ -81,10 +86,45 @@ const patterns = [...summary.data.exposedPatterns].sort((a, b) => b.totalCount -
 		padding-bottom: 0;
 	}
 
+	.finding-name {
+		display: inline-flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		min-width: 0;
+	}
+
 	.finding-label {
 		font-size: 0.95rem;
 		font-weight: 500;
 		color: var(--text);
+	}
+
+	.sev {
+		flex-shrink: 0;
+		align-self: center;
+		font-size: 0.68rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		padding: 0.1em 0.45em;
+		border-radius: 999px;
+		white-space: nowrap;
+	}
+
+	.sev-required {
+		background: var(--red-dim);
+		color: var(--red-text);
+	}
+
+	.sev-recommended {
+		background: var(--amber-dim);
+		color: var(--amber-text);
+	}
+
+	.sev-informational {
+		background: var(--bg-2);
+		color: var(--text-mut);
 	}
 
 	.finding-link {

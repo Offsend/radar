@@ -1,0 +1,86 @@
+---
+import type { SummaryEntry } from '../lib/summaries';
+import CopyBlock from './CopyBlock.astro';
+import { getPatternGuideById } from '../lib/guides';
+
+interface Props {
+	summary: SummaryEntry;
+}
+
+const { summary } = Astro.props;
+
+const topGuides = [...summary.data.exposedPatterns]
+	.sort((a, b) => b.reposAffected - a.reposAffected || b.totalCount - a.totalCount)
+	.map((pattern) => getPatternGuideById(pattern.id))
+	.filter((guide): guide is NonNullable<typeof guide> => Boolean(guide))
+	.slice(0, 4);
+
+const lines: string[] = [];
+const seen = new Set<string>();
+for (const guide of topGuides) {
+	for (const line of guide.ignoreSnippet.split('\n')) {
+		const trimmed = line.trim();
+		if (!trimmed || seen.has(trimmed)) continue;
+		seen.add(trimmed);
+		lines.push(trimmed);
+	}
+}
+
+const snippet = lines.join('\n');
+const categoryLabels = topGuides.map((guide) => guide.title);
+---
+
+{snippet && (
+	<div class="card fix-it">
+		<h3>Fix the top risks</h3>
+		<p class="fix-it-scope">
+			Patterns covering this week's most widespread categories
+			{categoryLabels.length > 0 && ` (${categoryLabels.join(', ')})`}.
+			Add them to a dedicated AI exclude file (for example <code>.cursorignore</code> or
+			<code>.claudeignore</code>) — and to <code>.gitignore</code> so the files are never committed.
+		</p>
+		<CopyBlock code={snippet} label="AI exclude rules" />
+		<p class="fix-it-note">
+			Per-category guidance lives in the <a href="/patterns/">risk pattern guides</a>.
+		</p>
+	</div>
+)}
+
+<style>
+	.fix-it h3 {
+		margin: 0 0 0.5rem;
+		font-family: var(--heading);
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--text);
+	}
+
+	.fix-it-scope {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--text-sub);
+		line-height: 1.5;
+	}
+
+	.fix-it-scope :global(code) {
+		font-family: var(--mono);
+		font-size: 0.88em;
+		background: var(--bg-2);
+		padding: 0.1em 0.35em;
+		border-radius: 4px;
+	}
+
+	.fix-it-note {
+		margin: 0.75rem 0 0;
+		font-size: 0.85rem;
+		color: var(--text-mut);
+	}
+
+	.fix-it-note a {
+		color: var(--blue-text);
+	}
+
+	.fix-it-note a:hover {
+		text-decoration: underline;
+	}
+</style>

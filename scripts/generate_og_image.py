@@ -54,8 +54,8 @@ def get_repos_with_risk_signals_pct(summary: dict[str, Any]) -> float | None:
     return float(totals.get("reposWithExposures") or 0) / scan_complete
 
 
-def get_dedicated_ai_ignore_coverage(summary: dict[str, Any]) -> float | None:
-    stored = (summary.get("ignoreCoverage") or {}).get("dedicatedAiIgnorePct")
+def get_ai_exclude_coverage(summary: dict[str, Any]) -> float | None:
+    stored = (summary.get("ignoreCoverage") or {}).get("aiExcludePct")
     if stored is not None:
         return float(stored)
     return None
@@ -113,7 +113,7 @@ def build_template_values(
         "SCANNED": escape(str(cohort.get("scanComplete", 0))),
         "SIGNALS": escape(str(totals.get("totalExposedFiles", 0))),
         "REPOS_AFFECTED": escape(format_optional_pct(get_repos_with_risk_signals_pct(summary))),
-        "AI_IGNORE": escape(format_optional_pct(get_dedicated_ai_ignore_coverage(summary))),
+        "AI_IGNORE": escape(format_optional_pct(get_ai_exclude_coverage(summary))),
     }
 
 

@@ -53,6 +53,26 @@ const IGNORE_LABELS: Record<string, string> = {
 	'zed-ignore': '.zedignore',
 };
 
+const SEVERITY_LABELS: Record<string, string> = {
+	required: 'Required',
+	recommended: 'Recommended',
+	informational: 'Info',
+};
+
+const SEVERITY_RANK: Record<string, number> = {
+	required: 0,
+	recommended: 1,
+	informational: 2,
+};
+
+export function formatSeverityLabel(severity: string): string {
+	return SEVERITY_LABELS[severity] ?? severity;
+}
+
+export function severityRank(severity: string): number {
+	return SEVERITY_RANK[severity] ?? 3;
+}
+
 function humanizeId(id: string): string {
 	return id
 		.split('-')

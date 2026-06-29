@@ -771,6 +771,10 @@ export function getIgnoreGuideBySlug(slug: string): IgnoreGuide | undefined {
 	return IGNORE_BY_SLUG.get(slug);
 }
 
+export function getPatternGuideById(id: string): PatternGuide | undefined {
+	return PATTERN_BY_ID.get(id);
+}
+
 export function patternGuideSlugById(id: string): string | undefined {
 	return PATTERN_BY_ID.get(id)?.slug;
 }

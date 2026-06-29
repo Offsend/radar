@@ -2,10 +2,17 @@
 import type { SummaryEntry } from '../lib/summaries';
 import {
 	formatPct,
-	getDedicatedAiIgnoreCoverage,
+	getAiExcludeCoverage,
 	getReportLabel,
+	getReposWithRiskSignalsPct,
+	getRiskSignalsPerRepo,
 	getTopRiskSignalCategory,
 } from '../lib/summaries';
+
+function formatPerRepo(value: number | undefined): string {
+	if (value === undefined) return '—';
+	return value.toFixed(1);
+}
 
 interface Props {
 	summary: SummaryEntry;
@@ -56,14 +63,24 @@ function metricValue(entry: SummaryEntry | undefined, getter: (entry: SummaryEnt
 					<td>{metricValue(right, (entry) => entry.data.cohort.scanComplete)}</td>
 				</tr>
 				<tr>
-					<td>Dedicated AI ignore coverage</td>
-					<td>{formatPct(getDedicatedAiIgnoreCoverage(left))}</td>
-					<td>{metricValue(right, (entry) => formatPct(getDedicatedAiIgnoreCoverage(entry)))}</td>
+					<td>AI exclude-file coverage</td>
+					<td>{formatPct(getAiExcludeCoverage(left))}</td>
+					<td>{metricValue(right, (entry) => formatPct(getAiExcludeCoverage(entry)))}</td>
 				</tr>
 				<tr>
-					<td>AI-context risk signals</td>
+					<td>Repos with risk signals</td>
+					<td>{formatPct(getReposWithRiskSignalsPct(left))}</td>
+					<td>{metricValue(right, (entry) => formatPct(getReposWithRiskSignalsPct(entry)))}</td>
+				</tr>
+				<tr>
+					<td>AI-context risk signals <span class="metric-note">(absolute)</span></td>
 					<td>{left.data.totals.totalExposedFiles}</td>
 					<td>{metricValue(right, (entry) => entry.data.totals.totalExposedFiles)}</td>
+				</tr>
+				<tr>
+					<td>Risk signals per scanned repo</td>
+					<td>{formatPerRepo(getRiskSignalsPerRepo(left))}</td>
+					<td>{metricValue(right, (entry) => formatPerRepo(getRiskSignalsPerRepo(entry)))}</td>
 				</tr>
 				<tr>
 					<td>Top category</td>
@@ -94,5 +111,10 @@ function metricValue(entry: SummaryEntry | undefined, getter: (entry: SummaryEnt
 	.report-comparison th:not(:first-child),
 	.report-comparison td:not(:first-child) {
 		text-align: right;
+	}
+
+	.metric-note {
+		color: var(--text-mut);
+		font-weight: 400;
 	}
 </style>

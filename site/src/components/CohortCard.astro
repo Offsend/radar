@@ -1,9 +1,9 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import {
-	computeIgnoreCoverage,
 	formatGeneratedAt,
 	formatPct,
+	getAiExcludeCoverage,
 	getReposWithRiskSignalsPct,
 } from '../lib/summaries';
 
@@ -13,7 +13,7 @@ interface Props {
 
 const { summary } = Astro.props;
 const { cohort, totals, toolVersionRange, rulesetVersions } = summary.data;
-const { dedicatedAiIgnorePct } = computeIgnoreCoverage(summary);
+const aiExcludePct = getAiExcludeCoverage(summary);
 const reposWithRiskSignalsPct = getReposWithRiskSignalsPct(summary);
 ---
 
@@ -36,9 +36,9 @@ const reposWithRiskSignalsPct = getReposWithRiskSignalsPct(summary);
 		</div>
 	</div>
 	<div class="card kpi-card">
-		<h3>Dedicated AI ignore coverage</h3>
-		<div class="stat-value">{formatPct(dedicatedAiIgnorePct)}</div>
-		<div class="stat-label">repos with AI-specific ignore files</div>
+		<h3>AI exclude-file coverage</h3>
+		<div class="stat-value">{formatPct(aiExcludePct)}</div>
+		<div class="stat-label">repos with a dedicated AI exclude file</div>
 	</div>
 </div>
 

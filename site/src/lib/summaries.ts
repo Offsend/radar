@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { formatIgnoreLabel, formatPatternLabel, formatPatternShort } from './labels';
+import { formatPatternLabel, formatPatternShort } from './labels';
 
 export type SummaryEntry = CollectionEntry<'summaries'>;
 
@@ -13,6 +13,10 @@ export const PRIORITY_DEDICATED_IGNORE_IDS = [
 	'copilot-exclude',
 	'llm-ignore',
 ] as const;
+
+// Instruction/context files that add context for AI tools rather than excluding
+// files from it. They must not count as "exclude coverage".
+export const CONTEXT_DOC_IGNORE_IDS = ['agents-md', 'claude-md', 'cursor-project-rules'] as const;
 
 export async function getAllSummaries(): Promise<SummaryEntry[]> {
 	const items = await getCollection('summaries');
@@ -47,14 +51,22 @@ export function formatPct(pct: number | undefined): string {
 	return `${Math.round(pct * 100)}%`;
 }
 
-export function isDedicatedAiIgnoreRule(ruleId: string): boolean {
-	return ruleId !== GIT_IGNORE_RULE_ID;
+export function isContextDocRule(ruleId: string): boolean {
+	return (CONTEXT_DOC_IGNORE_IDS as readonly string[]).includes(ruleId);
 }
 
-export function getDedicatedAiIgnoreCoverage(summary: SummaryEntry): number | undefined {
-	const stored = summary.data.ignoreCoverage?.dedicatedAiIgnorePct;
-	if (stored !== undefined) return stored;
-	return undefined;
+// "Exclude" rules actually keep files out of AI context, unlike instruction
+// docs (AGENTS.md, CLAUDE.md, project rules) which only add context.
+export function isExcludeIgnoreRule(ruleId: string): boolean {
+	return ruleId !== GIT_IGNORE_RULE_ID && !isContextDocRule(ruleId);
+}
+
+export function getAiExcludeCoverage(summary: SummaryEntry): number | undefined {
+	return summary.data.ignoreCoverage?.aiExcludePct;
+}
+
+export function getAiContextDocCoverage(summary: SummaryEntry): number | undefined {
+	return summary.data.ignoreCoverage?.aiContextDocPct;
 }
 
 export function getReposWithRiskSignalsPct(summary: SummaryEntry): number {
@@ -63,27 +75,39 @@ export function getReposWithRiskSignalsPct(summary: SummaryEntry): number {
 	return totals.reposWithExposures / cohort.scanComplete;
 }
 
+export function getRiskSignalsPerRepo(summary: SummaryEntry): number | undefined {
+	const { cohort, totals } = summary.data;
+	if (cohort.scanComplete === 0) return undefined;
+	return totals.totalExposedFiles / cohort.scanComplete;
+}
+
 export type IgnoreCoverageStats = {
-	dedicatedAiIgnorePct: number | undefined;
-	dedicatedTypesInUse: number;
-	totalDedicatedTypes: number;
+	aiExcludePct: number | undefined;
+	excludeTypesInUse: number;
+	totalExcludeTypes: number;
 };
 
 export function computeIgnoreCoverage(summary: SummaryEntry): IgnoreCoverageStats {
-	const dedicatedRules = Object.entries(summary.data.ignoreFilesPresent).filter(([id]) =>
-		isDedicatedAiIgnoreRule(id),
+	const excludeRules = Object.entries(summary.data.ignoreFilesPresent).filter(([id]) =>
+		isExcludeIgnoreRule(id),
 	);
 
 	return {
-		dedicatedAiIgnorePct: getDedicatedAiIgnoreCoverage(summary),
-		dedicatedTypesInUse: dedicatedRules.filter(([, rule]) => rule.pct > 0).length,
-		totalDedicatedTypes: dedicatedRules.length,
+		aiExcludePct: getAiExcludeCoverage(summary),
+		excludeTypesInUse: excludeRules.filter(([, rule]) => rule.pct > 0).length,
+		totalExcludeTypes: excludeRules.length,
 	};
 }
 
-export function getDedicatedIgnoreRules(summary: SummaryEntry) {
+export function getExcludeIgnoreRules(summary: SummaryEntry) {
 	return Object.entries(summary.data.ignoreFilesPresent)
-		.filter(([id]) => isDedicatedAiIgnoreRule(id))
+		.filter(([id]) => isExcludeIgnoreRule(id))
+		.sort(([, a], [, b]) => b.pct - a.pct);
+}
+
+export function getContextDocRules(summary: SummaryEntry) {
+	return Object.entries(summary.data.ignoreFilesPresent)
+		.filter(([id]) => isContextDocRule(id))
 		.sort(([, a], [, b]) => b.pct - a.pct);
 }
 
@@ -174,20 +198,18 @@ export function buildReportSummary(summary: SummaryEntry): string[] {
 		);
 	}
 
-	const { dedicatedAiIgnorePct, dedicatedTypesInUse } = computeIgnoreCoverage(summary);
+	const { aiExcludePct, excludeTypesInUse } = computeIgnoreCoverage(summary);
 
-	if (dedicatedAiIgnorePct === undefined) {
-		sentences.push('Dedicated AI ignore coverage is unavailable for this report.');
+	if (aiExcludePct === undefined) {
+		sentences.push('AI exclude-file coverage is unavailable for this report.');
 	} else {
 		sentences.push(
-			`${formatPct(dedicatedAiIgnorePct)} of scanned repos include dedicated AI ignore files${dedicatedTypesInUse > 0 ? ` (${dedicatedTypesInUse} type${dedicatedTypesInUse === 1 ? '' : 's'} in use)` : ''}.`,
+			`${formatPct(aiExcludePct)} of scanned repos use a dedicated AI exclude file${excludeTypesInUse > 0 ? ` (${excludeTypesInUse} type${excludeTypesInUse === 1 ? '' : 's'} in use)` : ''}.`,
 		);
 	}
 
 	return sentences;
 }
-
-const DOC_IGNORE_IDS = new Set(['agents-md', 'claude-md']);
 
 function formatItemList(items: string[]): string {
 	if (items.length === 0) return '';
@@ -232,29 +254,6 @@ function describeDominantSignalTypes(
 	return 'across several sensitive path categories';
 }
 
-function isDocHeavyDedicatedIgnore(summary: SummaryEntry): boolean {
-	const rules = getDedicatedIgnoreRules(summary).filter(([, rule]) => rule.pct > 0);
-	if (rules.length === 0) return false;
-
-	const docPct = Math.max(
-		...rules.filter(([id]) => DOC_IGNORE_IDS.has(id)).map(([, rule]) => rule.pct),
-		0,
-	);
-	const toolPct = Math.max(
-		...rules.filter(([id]) => !DOC_IGNORE_IDS.has(id)).map(([, rule]) => rule.pct),
-		0,
-	);
-
-	return docPct > 0 && docPct >= toolPct;
-}
-
-function getLeadingDocIgnoreLabels(summary: SummaryEntry): string[] {
-	return getDedicatedIgnoreRules(summary)
-		.filter(([id, rule]) => DOC_IGNORE_IDS.has(id) && rule.pct > 0)
-		.slice(0, 2)
-		.map(([id]) => formatIgnoreLabel(id));
-}
-
 function buildRiskActionSentence(
 	patternsByBreadth: SummaryEntry['data']['exposedPatterns'],
 	scanComplete: number,
@@ -279,22 +278,13 @@ function buildRiskActionSentence(
 function buildRiskInsightSentence(
 	summary: SummaryEntry,
 	reposWithRiskPct: number,
-	dedicatedAiIgnorePct: number | undefined,
+	aiExcludePct: number | undefined,
 	patternsByVolume: SummaryEntry['data']['exposedPatterns'],
 ): string | undefined {
 	const { totals } = summary.data;
 
-	if (
-		dedicatedAiIgnorePct !== undefined &&
-		dedicatedAiIgnorePct < reposWithRiskPct - 0.001
-	) {
-		return `Fewer repos use dedicated AI ignore files (${formatPct(dedicatedAiIgnorePct)}) than show risk signals (${formatPct(reposWithRiskPct)}).`;
-	}
-
-	if (dedicatedAiIgnorePct !== undefined && isDocHeavyDedicatedIgnore(summary)) {
-		const docLabels = getLeadingDocIgnoreLabels(summary);
-		const docList = docLabels.length > 0 ? formatItemList(docLabels) : 'project docs';
-		return `${formatPct(dedicatedAiIgnorePct)} of repos have dedicated AI ignore files, but mostly as ${docList} rather than tool-specific path exclusions.`;
+	if (aiExcludePct !== undefined && aiExcludePct < reposWithRiskPct - 0.001) {
+		return `Far fewer repos use a dedicated AI exclude file (${formatPct(aiExcludePct)}) than show risk signals (${formatPct(reposWithRiskPct)}).`;
 	}
 
 	const avgSignalsPerRepo = totals.totalExposedFiles / totals.reposWithExposures;
@@ -309,8 +299,8 @@ function buildRiskInsightSentence(
 		return `${formatPatternLabel(topPattern.id)} alone accounted for ${formatPct(topShare)} of all matches.`;
 	}
 
-	if (dedicatedAiIgnorePct !== undefined && dedicatedAiIgnorePct > 0) {
-		return `${formatPct(dedicatedAiIgnorePct)} of repos use dedicated AI ignore files, yet sensitive paths still appeared where exclusions were missing.`;
+	if (aiExcludePct !== undefined && aiExcludePct > 0) {
+		return `${formatPct(aiExcludePct)} of repos use a dedicated AI exclude file, yet sensitive paths still appeared where exclusions were missing.`;
 	}
 
 	return undefined;
@@ -318,7 +308,7 @@ function buildRiskInsightSentence(
 
 export function buildMainTakeaway(summary: SummaryEntry): string[] {
 	const { cohort, totals, exposedPatterns } = summary.data;
-	const { dedicatedAiIgnorePct } = computeIgnoreCoverage(summary);
+	const { aiExcludePct } = computeIgnoreCoverage(summary);
 	const paragraphs: string[] = [];
 
 	if (cohort.scanComplete === 0) {
@@ -328,15 +318,15 @@ export function buildMainTakeaway(summary: SummaryEntry): string[] {
 	if (totals.totalExposedFiles === 0) {
 		paragraphs.push("No AI-context risk signals were detected in this week's complete scans.");
 
-		if (dedicatedAiIgnorePct === undefined) {
-			paragraphs.push('Dedicated AI ignore coverage was not recorded for this report.');
-		} else if (dedicatedAiIgnorePct > 0) {
+		if (aiExcludePct === undefined) {
+			paragraphs.push('AI exclude-file coverage was not recorded for this report.');
+		} else if (aiExcludePct > 0) {
 			paragraphs.push(
-				`${formatPct(dedicatedAiIgnorePct)} of repos use dedicated AI ignore files — a useful baseline even when no signals show up in a given week.`,
+				`${formatPct(aiExcludePct)} of repos use a dedicated AI exclude file — a useful baseline even when no signals show up in a given week.`,
 			);
 		} else {
 			paragraphs.push(
-				'Consider adding dedicated AI ignore files before sensitive paths start appearing in agent context.',
+				'Consider adding a dedicated AI exclude file before sensitive paths start appearing in agent context.',
 			);
 		}
 
@@ -355,7 +345,7 @@ export function buildMainTakeaway(summary: SummaryEntry): string[] {
 	const insight = buildRiskInsightSentence(
 		summary,
 		reposWithRiskPct,
-		dedicatedAiIgnorePct,
+		aiExcludePct,
 		patternsByVolume,
 	);
 	const action = buildRiskActionSentence(patternsByBreadth, cohort.scanComplete);
@@ -372,11 +362,11 @@ export function buildMainTakeaway(summary: SummaryEntry): string[] {
 }
 
 export function getNonZeroIgnoreRules(summary: SummaryEntry) {
-	return getDedicatedIgnoreRules(summary).filter(([, rule]) => rule.pct > 0);
+	return getExcludeIgnoreRules(summary).filter(([, rule]) => rule.pct > 0);
 }
 
 export function getAllIgnoreRules(summary: SummaryEntry) {
-	return getDedicatedIgnoreRules(summary);
+	return getExcludeIgnoreRules(summary);
 }
 
 export type ExposureHook = {
@@ -408,7 +398,7 @@ export function buildExposureHook(summary: SummaryEntry): ExposureHook {
 
 	return {
 		headline: 'AI coding tools can read everything in your repo',
-		lead: `Offsend Radar scanned ${repos} open-source ${repoWord} this week. ${totals.totalExposedFiles} sensitive ${fileWord}${examples ? ` — ${examples} —` : ''} sat in plain sight in ${totals.reposWithExposures} of them, readable by any AI assistant with repository access.`,
+		lead: `Offsend Radar scanned ${repos} open-source ${repoWord} this week. ${totals.totalExposedFiles} sensitive ${fileWord}${examples ? ` — ${examples} —` : ''} were committed to ${totals.reposWithExposures} of them, in plain sight for any AI assistant with repository access.`,
 		hasExposure: true,
 	};
 }

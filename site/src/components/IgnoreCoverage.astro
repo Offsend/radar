@@ -4,8 +4,10 @@ import { formatIgnoreLabel } from '../lib/labels';
 import { ignoreGuideSlugById } from '../lib/guides';
 import {
 	formatPct,
+	getAiContextDocCoverage,
+	getAiExcludeCoverage,
 	getAllIgnoreRules,
-	getDedicatedAiIgnoreCoverage,
+	getContextDocRules,
 	getNonZeroIgnoreRules,
 	getPriorityDedicatedIgnoreRules,
 } from '../lib/summaries';
@@ -16,22 +18,25 @@ interface Props {
 
 const { summary } = Astro.props;
 
-const dedicatedCoverage = getDedicatedAiIgnoreCoverage(summary);
+const excludeCoverage = getAiExcludeCoverage(summary);
 const priorityRules = getPriorityDedicatedIgnoreRules(summary);
 const nonZeroRules = getNonZeroIgnoreRules(summary);
 const allRules = getAllIgnoreRules(summary);
 const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) => priorityId === id));
+
+const contextCoverage = getAiContextDocCoverage(summary);
+const contextRules = getContextDocRules(summary);
 ---
 
 <div class="card">
-	<h2>Dedicated AI ignore files</h2>
+	<h2>AI exclude files</h2>
 	<p class="coverage-summary">
 		<span class="coverage-stat">
-			<strong>{formatPct(dedicatedCoverage)}</strong> dedicated AI ignore coverage
+			<strong>{formatPct(excludeCoverage)}</strong> of repos use a dedicated AI exclude file
 		</span>
 	</p>
 	<p class="coverage-insight">
-		Dedicated AI ignore files are still rare.
+		These actually keep matching files out of AI context — and they are still rare.
 	</p>
 
 	{priorityRules.map(([id, rule]) => (
@@ -57,7 +62,7 @@ const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) 
 	{extraRules.length > 0 && (
 		<details class="ignore-details">
 			<summary>
-				Show {extraRules.length} more dedicated ignore type{extraRules.length === 1 ? '' : 's'}
+				Show {extraRules.length} more exclude file type{extraRules.length === 1 ? '' : 's'}
 				{nonZeroRules.length > 0 && ` (${nonZeroRules.length} in use overall)`}
 			</summary>
 			<div class="ignore-details-list">
@@ -84,6 +89,41 @@ const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) 
 		</details>
 	)}
 </div>
+
+{contextRules.length > 0 && (
+	<div class="card">
+		<h2>AI context files</h2>
+		<p class="coverage-summary">
+			<span class="coverage-stat">
+				<strong>{formatPct(contextCoverage)}</strong> of repos ship an AI context file
+			</span>
+		</p>
+		<p class="coverage-insight">
+			Files like AGENTS.md and CLAUDE.md give AI tools project instructions — they
+			<strong>add</strong> context, they do not exclude anything. They are not a substitute for an exclude file.
+		</p>
+
+		{contextRules.map(([id, rule]) => (
+			<div class="bar-row">
+				{ignoreGuideSlugById(id) ? (
+					<a class="bar-label bar-label-link" href={`/ignore-files/${ignoreGuideSlugById(id)}/`}>
+						{formatIgnoreLabel(id)}
+					</a>
+				) : (
+					<span class="bar-label">{formatIgnoreLabel(id)}</span>
+				)}
+				<div class="bar-track">
+					<div
+						class="bar-fill bar-fill-context"
+						class:list={{ 'bar-fill-zero': rule.pct === 0 }}
+						style={`width: ${Math.max(Math.round(rule.pct * 100), rule.pct > 0 ? 2 : 0)}%`}
+					/>
+				</div>
+				<span class="bar-pct">{formatPct(rule.pct)}</span>
+			</div>
+		))}
+	</div>
+)}
 
 <style>
 	.coverage-summary {
@@ -142,5 +182,9 @@ const extraRules = allRules.filter(([id]) => !priorityRules.some(([priorityId]) 
 
 	.bar-fill-zero {
 		opacity: 0.35;
+	}
+
+	.bar-fill-context {
+		background: var(--text-mut);
 	}
 </style>

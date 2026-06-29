@@ -47,6 +47,8 @@ const publicListingSchema = z.object({
 const ignoreCoverageSchema = z.object({
 	gitIgnorePct: z.number(),
 	dedicatedAiIgnorePct: z.number(),
+	aiExcludePct: z.number().optional(),
+	aiContextDocPct: z.number().optional(),
 });
 
 const summarySchema = z.object({

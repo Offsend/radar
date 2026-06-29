@@ -20,7 +20,14 @@ import yaml
 
 SCHEMA_VERSION = 1
 GIT_IGNORE_RULE_ID = "git-ignore"
+# Instruction/context files that *add* context for AI tools rather than
+# excluding files from it. They must not count toward exclude coverage.
+CONTEXT_DOC_RULE_IDS = {"agents-md", "claude-md", "cursor-project-rules"}
 SLUG_RE = re.compile(r"^[^/]+/[^/]+$")
+
+
+def is_exclude_ignore_rule(rule_id: str) -> bool:
+    return rule_id != GIT_IGNORE_RULE_ID and rule_id not in CONTEXT_DOC_RULE_IDS
 
 
 def utc_now_iso() -> str:
@@ -312,6 +319,8 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
     total_exposed_files = 0
     repos_with_git_ignore = 0
     repos_with_dedicated_ai_ignore = 0
+    repos_with_ai_exclude = 0
+    repos_with_ai_context_doc = 0
 
     for report in reports:
         tool_version = report.get("toolVersion")
@@ -350,6 +359,18 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
             if rule_id != GIT_IGNORE_RULE_ID and present
         ):
             repos_with_dedicated_ai_ignore += 1
+        if any(
+            present
+            for rule_id, present in ignore_present.items()
+            if is_exclude_ignore_rule(rule_id) and present
+        ):
+            repos_with_ai_exclude += 1
+        if any(
+            present
+            for rule_id, present in ignore_present.items()
+            if rule_id in CONTEXT_DOC_RULE_IDS and present
+        ):
+            repos_with_ai_context_doc += 1
 
     exposed_patterns = [
         {
@@ -391,6 +412,10 @@ def aggregate_week(state_dir: Path, week: str, dry_run: bool) -> dict[str, Any]:
         "ignoreCoverage": {
             "gitIgnorePct": round(repos_with_git_ignore / len(reports), 4) if reports else 0.0,
             "dedicatedAiIgnorePct": round(repos_with_dedicated_ai_ignore / len(reports), 4)
+            if reports
+            else 0.0,
+            "aiExcludePct": round(repos_with_ai_exclude / len(reports), 4) if reports else 0.0,
+            "aiContextDocPct": round(repos_with_ai_context_doc / len(reports), 4)
             if reports
             else 0.0,
         },
