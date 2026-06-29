@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "week": "2026-W26",
-  "generatedAt": "2026-06-29T22:02:17Z",
+  "generatedAt": "2026-06-26T13:16:21Z",
   "toolVersionRange": [
     "0.8.0",
     "0.8.0"
@@ -105,9 +105,7 @@
   },
   "ignoreCoverage": {
     "gitIgnorePct": 1.0,
-    "dedicatedAiIgnorePct": 0.3438,
-    "aiExcludePct": 0.0312,
-    "aiContextDocPct": 0.3125
+    "dedicatedAiIgnorePct": 0.3438
   },
   "exposedPatterns": [
     {
