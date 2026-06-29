@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "week": "2026-W27",
+  "generatedAt": "2026-06-29T11:10:55Z",
+  "toolVersionRange": [
+    "0.8.0",
+    "0.8.0"
+  ],
+  "rulesetVersions": [
+    "6f8fef790c56173d"
+  ],
+  "cohort": {
+    "targeted": 100,
+    "scanned": 100,
+    "skipped": 0,
+    "errors": 0,
+    "scanComplete": 100
+  },
+  "ignoreFilesPresent": {
+    "agents-md": {
+      "present": 24,
+      "total": 100,
+      "pct": 0.24
+    },
+    "aider-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "claude-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "claude-md": {
+      "present": 20,
+      "total": 100,
+      "pct": 0.2
+    },
+    "cline-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "codeium-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "cody-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "continue-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "copilot-exclude": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "cursor-ignore": {
+      "present": 2,
+      "total": 100,
+      "pct": 0.02
+    },
+    "cursor-indexing-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "cursor-project-rules": {
+      "present": 4,
+      "total": 100,
+      "pct": 0.04
+    },
+    "gemini-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "git-ignore": {
+      "present": 100,
+      "total": 100,
+      "pct": 1.0
+    },
+    "llm-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "roo-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    },
+    "zed-ignore": {
+      "present": 0,
+      "total": 100,
+      "pct": 0.0
+    }
+  },
+  "ignoreCoverage": {
+    "gitIgnorePct": 1.0,
+    "dedicatedAiIgnorePct": 0.36
+  },
+  "exposedPatterns": [
+    {
+      "id": "backup-files",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 3,
+      "totalCount": 5
+    },
+    {
+      "id": "log-files",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 2,
+      "totalCount": 4
+    },
+    {
+      "id": "android-keystore",
+      "category": "signing",
+      "severity": "recommended",
+      "reposAffected": 2,
+      "totalCount": 2
+    },
+    {
+      "id": "htpasswd-files",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "mysql-client-config",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "npmrc-files",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 7,
+      "totalCount": 10
+    },
+    {
+      "id": "terraform-rc",
+      "category": "cloud",
+      "severity": "recommended",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "yarn-config",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 2,
+      "totalCount": 2
+    },
+    {
+      "id": "credentials-json",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "env-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 16,
+      "totalCount": 40
+    },
+    {
+      "id": "key-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 11,
+      "totalCount": 28
+    },
+    {
+      "id": "kube-config",
+      "category": "cloud",
+      "severity": "required",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "pem-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 8,
+      "totalCount": 60
+    }
+  ],
+  "totals": {
+    "reposWithExposures": 37,
+    "totalExposedFiles": 156
+  },
+  "publicListings": []
+}
