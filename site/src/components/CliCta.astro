@@ -37,7 +37,17 @@ offsend prepare --dry-run</code></pre>
 		</button>
 	</div>
 	<p class="cli-cta-note">Everything runs locally. No file contents are uploaded.</p>
-	<a class="cli-cta-link" href="https://offsend.io">Learn more about Offsend →</a>
+	<div class="cli-cta-actions">
+		<a
+			class="cli-cta-btn"
+			href="https://check.offsend.io/"
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			Scan with Offsend Check
+		</a>
+		<a class="cli-cta-link" href="https://offsend.io">Learn more about Offsend →</a>
+	</div>
 </section>
 
 <script>
@@ -164,9 +174,36 @@ offsend prepare --dry-run</code></pre>
 		color: var(--text-mut);
 	}
 
-	.cli-cta-link {
-		display: inline-block;
+	.cli-cta-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem 1.25rem;
 		margin-top: 0.75rem;
+	}
+
+	.cli-cta-btn {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.55rem 1.1rem;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #fff;
+		background: var(--brand-blue);
+		border: 1px solid var(--brand-blue);
+		border-radius: var(--r-sm);
+		cursor: pointer;
+		transition:
+			background 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.cli-cta-btn:hover {
+		background: #2448a8;
+		transform: translateY(-1px);
+	}
+
+	.cli-cta-link {
 		font-size: 0.9rem;
 		font-weight: 500;
 		color: var(--blue-text);
