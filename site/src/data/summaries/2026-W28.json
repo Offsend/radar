@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 1,
+  "week": "2026-W28",
+  "generatedAt": "2026-07-06T07:09:31Z",
+  "toolVersionRange": [
+    "0.9.0",
+    "0.9.0"
+  ],
+  "rulesetVersions": [
+    "6f8fef790c56173d"
+  ],
+  "cohort": {
+    "targeted": 500,
+    "scanned": 500,
+    "skipped": 0,
+    "errors": 0,
+    "scanComplete": 500
+  },
+  "ignoreFilesPresent": {
+    "agents-md": {
+      "present": 110,
+      "total": 500,
+      "pct": 0.22
+    },
+    "aider-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "claude-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "claude-md": {
+      "present": 103,
+      "total": 500,
+      "pct": 0.206
+    },
+    "cline-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "codeium-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "cody-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "continue-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "copilot-exclude": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "cursor-ignore": {
+      "present": 2,
+      "total": 500,
+      "pct": 0.004
+    },
+    "cursor-indexing-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "cursor-project-rules": {
+      "present": 10,
+      "total": 500,
+      "pct": 0.02
+    },
+    "gemini-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "git-ignore": {
+      "present": 486,
+      "total": 500,
+      "pct": 0.972
+    },
+    "llm-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "roo-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    },
+    "zed-ignore": {
+      "present": 0,
+      "total": 500,
+      "pct": 0.0
+    }
+  },
+  "ignoreCoverage": {
+    "gitIgnorePct": 0.972,
+    "dedicatedAiIgnorePct": 0.298,
+    "aiExcludePct": 0.004,
+    "aiContextDocPct": 0.296
+  },
+  "exposedPatterns": [
+    {
+      "id": "backup-files",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 8,
+      "totalCount": 8
+    },
+    {
+      "id": "db-dumps",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "local-databases",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 7,
+      "totalCount": 8
+    },
+    {
+      "id": "log-files",
+      "category": "pii",
+      "severity": "informational",
+      "reposAffected": 11,
+      "totalCount": 113
+    },
+    {
+      "id": "android-keystore",
+      "category": "signing",
+      "severity": "recommended",
+      "reposAffected": 7,
+      "totalCount": 9
+    },
+    {
+      "id": "npmrc-files",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 57,
+      "totalCount": 63
+    },
+    {
+      "id": "pgp-keys",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 2,
+      "totalCount": 2
+    },
+    {
+      "id": "pgpass-files",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 1,
+      "totalCount": 1
+    },
+    {
+      "id": "pkcs12-p12",
+      "category": "signing",
+      "severity": "recommended",
+      "reposAffected": 2,
+      "totalCount": 2
+    },
+    {
+      "id": "pkcs12-pfx",
+      "category": "signing",
+      "severity": "recommended",
+      "reposAffected": 4,
+      "totalCount": 7
+    },
+    {
+      "id": "ssh-files",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 2,
+      "totalCount": 2
+    },
+    {
+      "id": "terraform-state",
+      "category": "cloud",
+      "severity": "recommended",
+      "reposAffected": 2,
+      "totalCount": 7
+    },
+    {
+      "id": "terraform-vars",
+      "category": "cloud",
+      "severity": "recommended",
+      "reposAffected": 4,
+      "totalCount": 7
+    },
+    {
+      "id": "yarn-config",
+      "category": "secret",
+      "severity": "recommended",
+      "reposAffected": 10,
+      "totalCount": 11
+    },
+    {
+      "id": "credentials-json",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 2,
+      "totalCount": 2
+    },
+    {
+      "id": "env-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 68,
+      "totalCount": 131
+    },
+    {
+      "id": "key-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 36,
+      "totalCount": 169
+    },
+    {
+      "id": "kube-config",
+      "category": "cloud",
+      "severity": "required",
+      "reposAffected": 3,
+      "totalCount": 5
+    },
+    {
+      "id": "pem-files",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 34,
+      "totalCount": 275
+    },
+    {
+      "id": "secrets-json",
+      "category": "secret",
+      "severity": "required",
+      "reposAffected": 1,
+      "totalCount": 1
+    }
+  ],
+  "totals": {
+    "reposWithExposures": 179,
+    "totalExposedFiles": 824
+  },
+  "publicListings": []
+}
