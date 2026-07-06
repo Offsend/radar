@@ -182,7 +182,7 @@ def clone_repo(slug: str, ref: str, token: str | None) -> Path:
     env = os.environ.copy()
     env["GIT_TERMINAL_PROMPT"] = "0"
     subprocess.run(
-        ["git", "clone", "--depth", "1", "--branch", ref, url, str(destination)],
+        ["git", "clone", "--depth", "1", "--branch", str(ref), url, str(destination)],
         check=True,
         capture_output=True,
         text=True,
@@ -519,7 +519,7 @@ def main() -> int:
         token = os.environ.get("GITHUB_TOKEN")
         for repo_spec in targets["repos"]:
             slug = repo_spec["repo"]
-            ref = repo_spec.get("ref", "main")
+            ref = str(repo_spec.get("ref", "main"))
             if slug in seen:
                 print(f"skip existing: {slug}")
                 continue
