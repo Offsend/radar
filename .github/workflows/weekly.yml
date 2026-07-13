@@ -44,11 +44,8 @@ jobs:
 
       - name: Install offsend CLI
         run: |
-          # Formula/offsend-cli.rb calls odie on macOS at load time, so
-          # `brew tap` / `brew install --cask offsend/tap/offsend-cli` exit 1
-          # even though the tap is cloned. Short-name cask install works after.
-          brew tap offsend/tap || true
-          brew install --cask offsend-cli
+          brew trust --cask offsend/tap/offsend-cli
+          brew install --cask offsend/tap/offsend-cli
           brew install librsvg
 
       - name: Install Python dependencies
