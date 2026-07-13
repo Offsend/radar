@@ -12,6 +12,12 @@ Offsend Radar is part of [Offsend](https://offsend.io/), a local-first CLI for c
 - [Participants](https://radar.offsend.io/participants/): Repositories whose maintainers opted in to named listings
 - [GitHub](https://github.com/Offsend/radar): Orchestrator source and opt-in instructions
 
+## Related Offsend products
+
+- [Offsend](https://offsend.io/): Local-first privacy toolkit for AI workflows
+- [Offsend Check](https://check.offsend.io/): Free online GitHub repo scan for secrets and missing AI ignore rules
+- [Offsend CLI](https://offsend.io/cli): Free command-line tool for terminals, git hooks, and CI
+
 ## Methodology summary
 
 - Path-level checks only — no file contents read, no secrets collected

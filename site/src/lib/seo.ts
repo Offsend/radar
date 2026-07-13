@@ -38,6 +38,13 @@ export function buildWebsiteSchema(): Record<string, unknown> {
 			'@type': 'Organization',
 			name: 'Offsend',
 			url: 'https://offsend.io',
+			sameAs: [
+				'https://github.com/Offsend/Offsend',
+				'https://github.com/Offsend/radar',
+				'https://offsend.io/',
+				'https://check.offsend.io/',
+				'https://radar.offsend.io/',
+			],
 		},
 	};
 }
