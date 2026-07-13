@@ -43,7 +43,9 @@ jobs:
           token: ${{ secrets.RADAR_STATE_TOKEN }}
 
       - name: Install offsend CLI
-        run: brew install Offsend/tap/offsend-cli librsvg
+        run: |
+          brew install --cask offsend/tap/offsend-cli
+          brew install librsvg
 
       - name: Install Python dependencies
         run: |
