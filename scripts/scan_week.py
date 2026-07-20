@@ -194,7 +194,7 @@ def clone_repo(slug: str, ref: str, token: str | None) -> Path:
 def run_offsend_report(offsend_bin: str, repo_dir: Path, out_path: Path) -> tuple[dict[str, Any], int]:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     result = subprocess.run(
-        [offsend_bin, "report", str(repo_dir), "--out", str(out_path)],
+        [offsend_bin, "show", str(repo_dir), "--report", "--out", str(out_path)],
         capture_output=True,
         text=True,
     )
