@@ -2,60 +2,60 @@
 
 /* ─── tokens (from offsend.io landing) ─────────────────────────────────── */
 :root {
-	--bg: oklch(99% 0.004 250);
-	--bg-1: oklch(97.5% 0.006 250);
-	--bg-2: oklch(95% 0.008 250);
-	--bg-3: oklch(91% 0.01 250);
-	--border: oklch(0% 0 0 / 0.08);
-	--border-2: oklch(0% 0 0 / 0.14);
+	--bg: #ffffff;
+	--bg-1: #f7f7f7;
+	--bg-2: #efefef;
+	--bg-3: #e4e4e4;
+	--border: rgba(3, 3, 3, 0.08);
+	--border-2: rgba(3, 3, 3, 0.16);
 
-	--text: oklch(22% 0.02 250);
-	--text-sub: oklch(42% 0.015 250);
-	--text-mut: oklch(58% 0.012 250);
-	--text-dim: oklch(72% 0.01 250);
+	--text: #030303;
+	--text-sub: #4a4a4a;
+	--text-mut: #7a7a7a;
+	--text-dim: #b0b0b0;
 
-	--brand-blue: #2c56cc;
-	--brand-sand: #e5d2a4;
-	--brand-gradient: linear-gradient(145deg, #2c56cc 0%, #6a84d4 42%, #c9bfa8 78%, #e5d2a4 100%);
-	--brand-gradient-soft: linear-gradient(145deg, #2c56cc12 0%, #e5d2a428 100%);
+	--brand-blue: #030303;
+	--brand-sand: #d9d9d9;
+	--brand-gradient: linear-gradient(145deg, #030303 0%, #555 100%);
+	--brand-gradient-soft: linear-gradient(145deg, rgba(3, 3, 3, 0.04) 0%, rgba(3, 3, 3, 0.02) 100%);
 
-	--blue: var(--brand-blue);
-	--blue-dim: #2c56cc18;
-	--blue-text: #2448a8;
+	--blue: #030303;
+	--blue-dim: rgba(3, 3, 3, 0.06);
+	--blue-text: #030303;
 
-	--amber: oklch(68% 0.17 75);
-	--amber-dim: oklch(68% 0.17 75 / 0.12);
-	--amber-text: oklch(48% 0.14 75);
+	--amber: #6b6b6b;
+	--amber-dim: rgba(3, 3, 3, 0.06);
+	--amber-text: #3a3a3a;
 
-	--red: oklch(55% 0.22 20);
-	--red-dim: oklch(55% 0.22 20 / 0.1);
-	--red-text: oklch(48% 0.18 20);
+	--red: #030303;
+	--red-dim: rgba(3, 3, 3, 0.06);
+	--red-text: #030303;
 
-	--green: oklch(52% 0.18 155);
-	--green-dim: oklch(52% 0.18 155 / 0.1);
-	--green-text: oklch(42% 0.14 155);
+	--green: #030303;
+	--green-dim: rgba(3, 3, 3, 0.06);
+	--green-text: #030303;
 
 	--r-sm: 8px;
 	--r: 12px;
-	--r-lg: 18px;
+	--r-lg: 16px;
 
-	--container: 1180px;
-	--gutter: 32px;
-	--topnav-inset: clamp(12px, 2.5vw, 20px);
+	--container: 1040px;
+	--gutter: 24px;
+	--topnav-inset: 0;
 
-	--glass-bg: oklch(99% 0.004 250 / 0.62);
-	--glass-bg-scrolled: oklch(99% 0.004 250 / 0.78);
-	--glass-bg-solid: oklch(97.5% 0.006 250);
-	--glass-border: oklch(0% 0 0 / 0.06);
-	--glass-border-scrolled: oklch(0% 0 0 / 0.08);
-	--glass-highlight: 0 1px 0 oklch(100% 0 0 / 0.5) inset;
-	--glass-highlight-scrolled: 0 1px 0 oklch(100% 0 0 / 0.55) inset;
-	--glass-shadow: 0 4px 24px oklch(0% 0 0 / 0.05);
-	--glass-shadow-scrolled: 0 8px 32px oklch(0% 0 0 / 0.07);
+	--glass-bg: #ffffff;
+	--glass-bg-scrolled: #ffffff;
+	--glass-bg-solid: #ffffff;
+	--glass-border: transparent;
+	--glass-border-scrolled: transparent;
+	--glass-highlight: none;
+	--glass-highlight-scrolled: none;
+	--glass-shadow: none;
+	--glass-shadow-scrolled: none;
 
-	--sans: 'DM Sans', system-ui, sans-serif;
-	--heading: 'Darker Grotesque', system-ui, sans-serif;
-	--mono: 'DM Mono', ui-monospace, monospace;
+	--sans: 'Geist Sans', system-ui, sans-serif;
+	--heading: 'Geist Sans', system-ui, sans-serif;
+	--mono: 'Geist Mono', ui-monospace, monospace;
 
 	/* aliases for radar components */
 	--bg-elevated: var(--bg-1);
@@ -98,11 +98,12 @@ h3,
 h4,
 .headline {
 	font-family: var(--heading);
-	font-weight: 600;
+	font-weight: 700;
+	letter-spacing: -0.04em;
 }
 
 ::selection {
-	background: var(--blue-dim);
+	background: rgba(3, 3, 3, 0.12);
 	color: var(--text);
 }
 
@@ -140,17 +141,9 @@ code,
 	padding: 0 var(--gutter);
 }
 
-/* ─── ambient brand gradient backdrop ──────────────────────────────────── */
+/* ─── ambient backdrop (disabled — matches landing) ────────────────────── */
 .gridfx {
-	position: fixed;
-	inset: 0;
-	pointer-events: none;
-	z-index: 0;
-	background:
-		radial-gradient(ellipse 90% 55% at 50% -5%, #2c56cc16 0%, transparent 58%),
-		radial-gradient(ellipse 65% 42% at 88% 12%, #e5d2a414 0%, transparent 52%),
-		linear-gradient(145deg, #2c56cc0c 0%, #6a84d408 38%, #e5d2a410 78%, transparent 100%);
-	mask-image: radial-gradient(ellipse 85% 65% at 50% 0%, #000 22%, transparent 84%);
+	display: none;
 }
 
 main {
@@ -165,7 +158,7 @@ nav.top {
 	top: 0;
 	z-index: 50;
 	padding: var(--topnav-inset);
-	background: transparent;
+	background: #fff;
 }
 
 nav.top .topnav-shell {
@@ -173,16 +166,11 @@ nav.top .topnav-shell {
 	z-index: 1;
 	max-width: var(--container);
 	margin: 0 auto;
-	border-radius: var(--r-lg);
-	background: var(--glass-bg);
-	-webkit-backdrop-filter: blur(20px) saturate(160%);
-	backdrop-filter: blur(20px) saturate(160%);
-	border: 1px solid var(--glass-border);
-	box-shadow: var(--glass-highlight), var(--glass-shadow);
-	transition:
-		background 0.28s ease,
-		border-color 0.28s ease,
-		box-shadow 0.28s ease;
+	padding: 0 var(--gutter);
+	border-radius: 0;
+	background: #fff;
+	border: none;
+	box-shadow: none;
 }
 
 nav.top.is-menu-open .topnav-shell {
@@ -190,9 +178,9 @@ nav.top.is-menu-open .topnav-shell {
 }
 
 nav.top.scrolled .topnav-shell {
-	background: var(--glass-bg-scrolled);
-	border-color: var(--glass-border-scrolled);
-	box-shadow: var(--glass-highlight-scrolled), var(--glass-shadow-scrolled);
+	background: #fff;
+	border-color: transparent;
+	box-shadow: none;
 }
 
 nav.top .row {
@@ -208,9 +196,9 @@ nav.top .row {
 		display: flex;
 		align-items: center;
 		gap: 22px;
-		padding: 0 16px;
-		height: 64px;
-		min-height: 64px;
+		padding: 0 var(--gutter);
+		height: 72px;
+		min-height: 72px;
 	}
 
 	nav.top .row {
@@ -242,11 +230,11 @@ nav.top .brand {
 }
 
 nav.top .brand:hover {
-	opacity: 0.85;
+	opacity: 0.72;
 }
 
 nav.top .brand img {
-	height: 26px;
+	height: 22px;
 	width: auto;
 	display: block;
 }
@@ -322,9 +310,9 @@ nav.top .platform-scan-line {
 	background: linear-gradient(
 		90deg,
 		transparent 0%,
-		oklch(44% 0.14 264 / 0.08) 35%,
-		oklch(44% 0.14 264 / 0.28) 50%,
-		oklch(44% 0.14 264 / 0.08) 65%,
+		rgba(3, 3, 3, 0.06) 35%,
+		rgba(3, 3, 3, 0.18) 50%,
+		rgba(3, 3, 3, 0.06) 65%,
 		transparent 100%
 	);
 	pointer-events: none;
@@ -362,8 +350,8 @@ nav.top .platform-sweep {
 		from 0deg,
 		transparent 0deg,
 		transparent 300deg,
-		oklch(44% 0.14 264 / 0.45) 328deg,
-		oklch(72% 0.08 85 / 0.35) 342deg,
+		rgba(3, 3, 3, 0.35) 328deg,
+		rgba(3, 3, 3, 0.12) 342deg,
 		transparent 360deg
 	);
 	pointer-events: none;
@@ -393,48 +381,48 @@ nav.top .topnav-end {
 nav.top .topnav-menu {
 	display: flex;
 	align-items: center;
-	gap: 22px;
+	gap: 24px;
 }
 
 nav.top .topnav-menu a {
-	font-size: 13px;
+	font-size: 15px;
 	font-weight: 500;
-	color: var(--text-sub);
+	letter-spacing: -0.01em;
+	color: var(--text);
 	cursor: pointer;
-	padding: 5px 10px;
-	margin: -5px -10px;
-	border-radius: var(--r-sm);
-	transition:
-		color 0.2s ease,
-		background 0.2s ease;
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+	transition: opacity 0.15s ease;
 }
 
 nav.top .topnav-menu a:hover {
 	color: var(--text);
-	background: oklch(0% 0 0 / 0.05);
+	background: transparent;
+	opacity: 0.55;
 }
 
 nav.top .topnav-menu a.active {
 	color: var(--text);
-	background: var(--bg-2);
+	background: transparent;
+	opacity: 0.55;
 }
 
 nav.top .topnav-menu a.topnav-github {
 	display: inline-flex;
 	align-items: center;
-	color: var(--text-sub);
+	color: var(--text);
 	cursor: pointer;
-	padding: 5px 10px;
-	margin: -5px -10px;
-	border-radius: var(--r-sm);
-	transition:
-		color 0.2s ease,
-		background 0.2s ease;
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+	transition: opacity 0.15s ease;
 }
 
 nav.top .topnav-menu a.topnav-github:hover {
 	color: var(--text);
-	background: oklch(0% 0 0 / 0.05);
+	background: transparent;
+	opacity: 0.55;
 }
 
 nav.top .topnav-menu a.topnav-github svg {
@@ -452,19 +440,18 @@ nav.top .topnav-burger {
 	height: 36px;
 	padding: 0;
 	border: none;
-	border-radius: 999px;
+	border-radius: 8px;
 	background: transparent;
-	color: var(--text-sub);
+	color: var(--text);
 	cursor: pointer;
 	-webkit-tap-highlight-color: transparent;
-	transition:
-		color 0.15s,
-		background 0.15s;
+	transition: opacity 0.15s;
 }
 
 nav.top .topnav-burger:hover {
 	color: var(--text);
-	background: oklch(0% 0 0 / 0.06);
+	background: transparent;
+	opacity: 0.55;
 }
 
 nav.top .topnav-burger:focus-visible {
@@ -526,7 +513,7 @@ nav.top .topnav-burger.is-open .topnav-burger-lines::after {
 	height: 100%;
 	min-height: 100dvh;
 	cursor: default;
-	background: oklch(0% 0 0 / 0.45);
+	background: rgba(3, 3, 3, 0.28);
 	backdrop-filter: blur(2px);
 	-webkit-backdrop-filter: blur(2px);
 }
@@ -779,7 +766,7 @@ footer .links a:hover {
 	margin: 0 0 0.35rem;
 	font-size: clamp(1.75rem, 4vw, 2.35rem);
 	font-weight: 700;
-	letter-spacing: -0.025em;
+	letter-spacing: -0.05em;
 	line-height: 1.15;
 }
 
@@ -803,27 +790,23 @@ footer .links a:hover {
 }
 
 .card {
-	background: oklch(100% 0 0 / 0.72);
+	background: #fff;
 	border: 1px solid var(--border);
 	border-radius: var(--r);
 	padding: 1.25rem;
-	box-shadow:
-		0 1px 2px oklch(0% 0 0 / 0.04),
-		inset 0 1px 0 oklch(100% 0 0 / 0.85);
+	box-shadow: none;
 }
 
 .card-featured {
-	background: oklch(100% 0 0 / 0.85);
-	border-color: oklch(44% 0.14 264 / 0.18);
+	background: var(--bg-1);
+	border-color: var(--border-2);
 	border-left: 3px solid var(--brand-blue);
-	box-shadow:
-		0 2px 8px oklch(44% 0.14 264 / 0.06),
-		inset 0 1px 0 oklch(100% 0 0 / 0.9);
+	box-shadow: none;
 }
 
 .card-cta {
 	background: var(--brand-gradient-soft);
-	border-color: oklch(44% 0.14 264 / 0.14);
+	border-color: var(--border);
 }
 
 .kpi-card {
@@ -834,9 +817,7 @@ footer .links a:hover {
 
 .kpi-card:hover {
 	border-color: var(--border-2);
-	box-shadow:
-		0 4px 12px oklch(0% 0 0 / 0.06),
-		inset 0 1px 0 oklch(100% 0 0 / 0.85);
+	box-shadow: none;
 }
 
 .card h2,
@@ -921,7 +902,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-	background: oklch(44% 0.14 264 / 0.04);
+	background: rgba(3, 3, 3, 0.03);
 }
 
 td a {
@@ -1014,7 +995,7 @@ td a.mono:hover {
 }
 
 .trend-list li:hover {
-	background: oklch(44% 0.14 264 / 0.04);
+	background: rgba(3, 3, 3, 0.03);
 }
 
 .trend-list a {
@@ -1141,8 +1122,8 @@ td a.mono:hover {
 	flex-wrap: wrap;
 	gap: 0.5rem 0.85rem;
 	padding: 0.85rem 1.1rem;
-	background: var(--brand-gradient-soft);
-	border: 1px solid oklch(44% 0.14 264 / 0.16);
+	background: var(--bg-1);
+	border: 1px solid var(--border);
 	border-radius: var(--r-sm);
 	font-size: 0.95rem;
 	color: var(--text-sub);
@@ -1197,7 +1178,7 @@ td a.mono:hover {
 	font-family: var(--mono);
 	font-size: 0.82rem;
 	color: var(--blue-text);
-	background: oklch(100% 0 0 / 0.6);
+	background: #fff;
 	border: 1px solid var(--border);
 	border-radius: var(--r-sm);
 	transition:
@@ -1206,8 +1187,8 @@ td a.mono:hover {
 }
 
 .guide-related a:hover {
-	border-color: var(--brand-blue);
-	background: oklch(100% 0 0 / 0.9);
+	border-color: var(--border-2);
+	background: var(--bg-1);
 }
 
 .guide-hub-grid {
@@ -1230,9 +1211,7 @@ td a.mono:hover {
 
 a.guide-hub-card:hover {
 	border-color: var(--border-2);
-	box-shadow:
-		0 4px 12px oklch(0% 0 0 / 0.06),
-		inset 0 1px 0 oklch(100% 0 0 / 0.85);
+	box-shadow: none;
 	transform: translateY(-1px);
 }
 

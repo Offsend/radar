@@ -24,28 +24,27 @@ const hook = buildExposureHook(summary);
 	.hero {
 		position: relative;
 		margin-bottom: 2rem;
-		padding: 2.25rem 2rem 2rem;
-		border-radius: var(--r-lg);
-		background: var(--brand-gradient-soft);
-		border: 1px solid oklch(44% 0.14 264 / 0.16);
-		border-left: 3px solid var(--red);
-		box-shadow:
-			0 2px 12px oklch(0% 0 0 / 0.05),
-			inset 0 1px 0 oklch(100% 0 0 / 0.85);
+		padding: 2.25rem 0 2rem;
+		border-radius: 0;
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid var(--border);
+		box-shadow: none;
 		overflow: hidden;
 	}
 
 	.hero-clear {
-		border-left-color: var(--green);
+		border-left-color: transparent;
 	}
 
 	.hero-eyebrow {
 		margin: 0 0 0.6rem;
+		font-family: var(--mono);
 		font-size: 0.75rem;
-		font-weight: 600;
+		font-weight: 500;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--brand-blue);
+		letter-spacing: 0.04em;
+		color: var(--text-mut);
 	}
 
 	.hero-headline {
@@ -55,7 +54,7 @@ const hook = buildExposureHook(summary);
 		font-size: clamp(2rem, 5vw, 3rem);
 		font-weight: 700;
 		line-height: 1.05;
-		letter-spacing: -0.03em;
+		letter-spacing: -0.05em;
 		color: var(--text);
 	}
 
@@ -64,6 +63,7 @@ const hook = buildExposureHook(summary);
 		max-width: 60ch;
 		font-size: clamp(1rem, 1.4vw, 1.15rem);
 		line-height: 1.55;
+		font-weight: 500;
 		color: var(--text-sub);
 	}
 
@@ -77,47 +77,57 @@ const hook = buildExposureHook(summary);
 	.hero-btn {
 		display: inline-flex;
 		align-items: center;
-		padding: 0.6rem 1.15rem;
-		font-size: 0.95rem;
-		font-weight: 600;
+		padding: 0.65rem 1.15rem;
+		font-size: 0.9rem;
+		font-weight: 500;
 		border-radius: var(--r-sm);
 		cursor: pointer;
 		transition:
-			background 0.15s ease,
-			border-color 0.15s ease,
-			color 0.15s ease,
-			transform 0.15s ease;
+			background 0.14s ease,
+			border-color 0.14s ease,
+			color 0.14s ease,
+			transform 0.2s ease,
+			box-shadow 0.25s ease;
 	}
 
 	.hero-btn-primary {
 		color: #fff;
-		background: var(--brand-blue);
-		border: 1px solid var(--brand-blue);
+		background: #030303;
+		border: 1px solid #030303;
+		box-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.22),
+			0 4px 12px rgba(0, 0, 0, 0.16),
+			inset 0 1px 0 rgba(255, 255, 255, 0.14);
 	}
 
 	.hero-btn-primary:hover {
-		background: #2448a8;
+		background: #222;
+		border-color: #222;
 		transform: translateY(-1px);
+		box-shadow:
+			0 2px 4px rgba(0, 0, 0, 0.18),
+			0 12px 28px rgba(0, 0, 0, 0.28),
+			inset 0 1px 0 rgba(255, 255, 255, 0.16);
 	}
 
 	.hero-btn-ghost {
 		color: var(--text);
-		background: oklch(100% 0 0 / 0.7);
+		background: #fff;
 		border: 1px solid var(--border-2);
 	}
 
 	.hero-btn-ghost:hover {
-		background: oklch(100% 0 0 / 0.95);
-		border-color: var(--brand-blue);
-		color: var(--blue-text);
+		background: var(--bg-1);
+		border-color: var(--border-2);
+		color: var(--text);
 	}
 
 	@media (max-width: 768px) {
 		.hero {
-			margin-left: calc(-1 * var(--gutter));
-			margin-right: calc(-1 * var(--gutter));
-			width: calc(100% + 2 * var(--gutter));
-			padding: 1.5rem var(--gutter) 1.35rem;
+			margin-left: 0;
+			margin-right: 0;
+			width: 100%;
+			padding: 1.5rem 0 1.35rem;
 			border-radius: 0;
 			border-left: none;
 			border-right: none;
