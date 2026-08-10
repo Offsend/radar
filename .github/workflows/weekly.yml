@@ -46,11 +46,20 @@ jobs:
         env:
           # Pin: 0.30+ stubs `show --report` (no scanComplete) and zeros fleet stats.
           OFFSEND_CLI_VERSION: "0.21.0"
-          # homebrew-tap commit that published this cask version
-          OFFSEND_CLI_CASK_REF: "c4e7a8f6f2b02feccdb78e09deab12832d156bef"
+          OFFSEND_CLI_SHA256: "ee17e703b876e86f8bef3016093aa5adf08ad4730d13ebedb1fa51dd1448800e"
         run: |
-          brew trust --cask offsend/tap/offsend-cli
-          brew install --cask "https://raw.githubusercontent.com/Offsend/homebrew-tap/${OFFSEND_CLI_CASK_REF}/Casks/offsend-cli.rb"
+          set -euo pipefail
+          archive="offsend-cli-${OFFSEND_CLI_VERSION}.zip"
+          curl -fsSL \
+            "https://github.com/Offsend/Offsend/releases/download/v${OFFSEND_CLI_VERSION}/${archive}" \
+            -o "${RUNNER_TEMP}/${archive}"
+          echo "${OFFSEND_CLI_SHA256}  ${RUNNER_TEMP}/${archive}" | shasum -a 256 -c -
+          install_root="${HOME}/.local/offsend-cli/${OFFSEND_CLI_VERSION}"
+          mkdir -p "${install_root}" "${HOME}/.local/bin"
+          unzip -q "${RUNNER_TEMP}/${archive}" -d "${install_root}"
+          ln -sfn "${install_root}/offsend" "${HOME}/.local/bin/offsend"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          export PATH="${HOME}/.local/bin:${PATH}"
           installed="$(offsend --version | tr -d '[:space:]')"
           if [ "$installed" != "$OFFSEND_CLI_VERSION" ]; then
             echo "expected offsend ${OFFSEND_CLI_VERSION}, got: ${installed}" >&2
