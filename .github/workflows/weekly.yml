@@ -43,9 +43,19 @@ jobs:
           token: ${{ secrets.RADAR_STATE_TOKEN }}
 
       - name: Install offsend CLI
+        env:
+          # Pin: 0.30+ stubs `show --report` (no scanComplete) and zeros fleet stats.
+          OFFSEND_CLI_VERSION: "0.21.0"
+          # homebrew-tap commit that published this cask version
+          OFFSEND_CLI_CASK_REF: "c4e7a8f6f2b02feccdb78e09deab12832d156bef"
         run: |
           brew trust --cask offsend/tap/offsend-cli
-          brew install --cask offsend/tap/offsend-cli
+          brew install --cask "https://raw.githubusercontent.com/Offsend/homebrew-tap/${OFFSEND_CLI_CASK_REF}/Casks/offsend-cli.rb"
+          installed="$(offsend --version | tr -d '[:space:]')"
+          if [ "$installed" != "$OFFSEND_CLI_VERSION" ]; then
+            echo "expected offsend ${OFFSEND_CLI_VERSION}, got: ${installed}" >&2
+            exit 1
+          fi
           brew install librsvg
 
       - name: Install Python dependencies
