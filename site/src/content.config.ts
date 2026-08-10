@@ -55,7 +55,8 @@ const summarySchema = z.object({
 	schemaVersion: z.literal(1),
 	week: z.string(),
 	generatedAt: z.string(),
-	toolVersionRange: z.tuple([z.string(), z.string()]),
+	// Empty when the week has no successful scans (no toolVersion recorded).
+	toolVersionRange: z.union([z.tuple([z.string(), z.string()]), z.tuple([])]),
 	rulesetVersions: z.array(z.string()),
 	cohort: cohortSchema,
 	ignoreCoverage: ignoreCoverageSchema.optional(),
